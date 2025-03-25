@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-
 class AuthProvider with ChangeNotifier {
   bool _isLoggedIn = false;
   String _errorMessage = '';
@@ -11,7 +10,6 @@ class AuthProvider with ChangeNotifier {
   String get errorMessage => _errorMessage;
 
   final String loginUrl = 'http://salvagefinancial.xyz:5000/api/Login';
-  final String signUpUrl = 'http://salvagefinancial.xyz/api/SignUp';
 
   Future<void> login(String email, String password) async {
     try {
@@ -34,19 +32,19 @@ class AuthProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         if (responseData['Result'] == 'Found user' &&
             responseData['token'] != null) {
-            _isLoggedIn = true;
-            _errorMessage = '';
+          _isLoggedIn = true;
+          _errorMessage = '';
         } else {
-            _errorMessage =
+          _errorMessage =
               responseData['message'] ??
               (responseData['error'] ?? 'User/Password Invaild');
-              return;
+          return;
         }
       } else {
-          _errorMessage =
+        _errorMessage =
             responseData['message'] ??
             'Server responded with ${response.statusCode}';
-            return;
+        return;
       }
     } on FormatException {
       _errorMessage = 'Invalid server response format';
@@ -57,40 +55,41 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<void> signUp(String email, String password) async {
+  // Method to sign up using API
+  Future<void> signUp(
+    String fName,
+    String lName,
+    String email,
+    String password,
+  ) async {
     try {
-      _errorMessage = '';
-      notifyListeners();
-
+      const String signUpUrl = 'http://salvagefinancial.xyz:5000/api/signup';
       final response = await http.post(
         Uri.parse(signUpUrl),
-        headers: {'Content-Type': 'application/json; charset=UTF-8'},
-        body: jsonEncode({'Email': email, 'Password': password}),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'Email': email,
+          'Password': password,
+          'FName': fName,
+          'LName': lName,
+        }),
       );
 
-      final responseData = json.decode(response.body);
-
       if (response.statusCode == 200) {
-        if (responseData['success'] == true) {
+        // Successful sign-up
+        final responseData = json.decode(response.body);
+        String result = responseData['Result'] ?? "Unknown error";
+        if (result == 'Added user') {
           _isLoggedIn = true;
-          _errorMessage = '';
+          notifyListeners();
         } else {
-          _errorMessage = responseData['message'] ?? 'Sign-up failed';
-          _isLoggedIn = false;
+          throw Exception('Sign-up failed');
         }
       } else {
-        if (response.statusCode == 400) {
-          _errorMessage = 'Email already exists';
-        } else {
-          _errorMessage = 'Sign-up failed. Please try again.';
-        }
-        _isLoggedIn = false;
+        throw Exception('Failed to sign up');
       }
     } catch (e) {
-      _errorMessage = 'Network error. Please check your connection.';
-      _isLoggedIn = false;
-    } finally {
-      notifyListeners();
+      throw Exception('Error: $e');
     }
   }
 

@@ -6,6 +6,8 @@ import 'HomeScreen.dart';
 class SignUpScreen extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +34,20 @@ class SignUpScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
+              controller: _firstNameController,
+              decoration: InputDecoration(
+                labelText: 'First Name',
+              ),
+            ),
+            SizedBox(height: 16.0),
+            TextField(
+              controller: _lastNameController,
+              decoration: InputDecoration(
+                labelText: 'Last Name',
+              ),
+            ),
+            SizedBox(height: 16.0),
+            TextField(
               controller: _emailController,
               decoration: InputDecoration(
                 labelText: 'Email',
@@ -51,6 +67,8 @@ class SignUpScreen extends StatelessWidget {
                 try {
                   // Call the API for sign-up
                   await authProvider.signUp(
+                    _firstNameController.text,
+                    _lastNameController.text,
                     _emailController.text,
                     _passwordController.text,
                   );

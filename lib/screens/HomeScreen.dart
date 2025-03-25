@@ -46,7 +46,7 @@ class CustomDrawer extends StatelessWidget {
             ListTile(
               title: const Text('SignUp'),
               onTap: () {
-                Navigator.pushNamed(context, '/SignUp');
+                Navigator.pushNamed(context, '/signup');
               },
             ),
             if(authProvider.isLoggedIn)
