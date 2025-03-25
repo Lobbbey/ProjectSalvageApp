@@ -11,15 +11,30 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
 
   @override
-  void initState() {
-    super.initState();
+  void dispose(){
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+
+    if (authProvider.errorMessage.isNotEmpty && !_isLoading) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(authProvider.errorMessage),
+            backgroundColor: Colors.red,
+          ),
+        );
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Salvage Financials'),
@@ -58,8 +73,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         fillColor: Colors.white,
                         border: OutlineInputBorder(),
                         labelText: 'Login',
-                        hintText: 'Enter Your Login Name',
+                        hintText: 'Enter Your Email',
                       ),
+                      keyboardType: TextInputType.emailAddress,
                     ),
                   ),
                   SizedBox(height: 10),
@@ -75,11 +91,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         labelText: 'Password',
                         hintText: 'Enter Your Password',
                       ),
+                      obscureText: true,
                     ),
                   ),
                   SizedBox(height: 10),
-                  //Login Button
-                  ElevatedButton(
+                  _isLoading
+                    ? CircularProgressIndicator()
+                    : ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       padding: EdgeInsets.symmetric(
@@ -88,21 +106,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     onPressed: () async {
-                      try {
+                      setState(() => _isLoading = true);
                         await authProvider.login(
-                          _emailController.text,
-                          _passwordController.text,
+                          _emailController.text.trim(),
+                          _passwordController.text.trim(),
                         );
-                        Navigator.pushNamed(context, '/analytics');
-                      } catch (e) {
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(
-                          SnackBar(
-                            content: Text(e.toString())
-                          )
-                        );
-                      }
+
+                        setState(() => _isLoading = false);
+
+                        if (authProvider.isLoggedIn) {
+                              Navigator.pushNamed(context, '/analytics');
+                            }
                     },
                     child: Text(
                       'Login',
