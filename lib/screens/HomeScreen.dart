@@ -8,11 +8,11 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Salvage Financials'),
+        title: const Text('Salvage Financial'),
       ),
       drawer: CustomDrawer(),
       body: Center(
-        child: Text('Welcome to Salvage Financials!'), 
+        child: Text('Welcome to Salvage Financial!'), 
       ),
     );
   }
@@ -75,7 +75,7 @@ class CustomDrawer extends StatelessWidget {
                 title: const Text('Logout'),
                 onTap: () async {
                   authProvider.logout();
-                  Navigator.pop(context, '/home');
+                  Navigator.pushNamed(context, '/home');
                 },
               ),
           ],

@@ -98,4 +98,37 @@ class AuthProvider with ChangeNotifier {
     _errorMessage = '';
     notifyListeners();
   }
+
+  Future<void> ResetPassword(String email, String newPass) async {
+    try{
+      const String rstPwdURI = 'http://salvagefinancial.xyz:5000/api/ResetPassword';
+      final Map<String, String> requestBody = {
+        'Email': email,
+        'NewPass': newPass,
+      };
+
+      final response = await http.post(
+        Uri.parse(rstPwdURI),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        encoding: Encoding.getByName("utf-8"),
+        body: jsonEncode(requestBody),
+      );
+
+
+        if(response.statusCode == 200){
+          
+        }
+        else{
+
+        }
+    }
+    catch (e){
+      _errorMessage = '';
+    }
+    finally{
+      notifyListeners();
+    }
+  }
 }

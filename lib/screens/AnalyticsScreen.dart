@@ -12,7 +12,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Salvage Financials'),
+        title: const Text('Analytics'),
         leading: Builder(
           builder: (context) {
             return IconButton(
