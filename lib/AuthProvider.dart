@@ -131,4 +131,23 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> AddInitial(int InitialDebt, int InitialAmount) async{
+    const Result = "Could not add amount and debt";
+    try{
+
+    }
+    catch(e){
+      _errorMessage = 'Could Not add amount and debt';
+    }
+    finally{
+      notifyListeners();
+    }
+  }
+
+  Future<void> AddIncome(String Name, int Amount, bool ifReccuring ) async{}
+
+  Future<void> AddExpense(String Name, int Amount, String Catagory) async {}
+
+  Future<void> EditIncome(String temp) async {}
 }
