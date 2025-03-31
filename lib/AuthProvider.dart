@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class AuthProvider with ChangeNotifier {
   bool _isLoggedIn = false;
   String _errorMessage = '';
+  int _userID = 0;
 
   bool get isLoggedIn => _isLoggedIn;
   String get errorMessage => _errorMessage;
@@ -32,7 +34,11 @@ class AuthProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         if (responseData['Result'] == 'Found user' &&
             responseData['token'] != null) {
+          String jwtToken = responseData['token'];
+          Map<String, dynamic> decodedToken = JwtDecoder.decode(jwtToken);
+          int userID = decodedToken['_id']; // Extracted user ID
           _isLoggedIn = true;
+          _userID = userID;
           _errorMessage = '';
         } else {
           _errorMessage =
@@ -96,58 +102,302 @@ class AuthProvider with ChangeNotifier {
   void logout() {
     _isLoggedIn = false;
     _errorMessage = '';
+    _userID = 0;
     notifyListeners();
   }
 
-  Future<void> ResetPassword(String email, String newPass) async {
-    try{
-      const String rstPwdURI = 'http://salvagefinancial.xyz:5000/api/ResetPassword';
-      final Map<String, String> requestBody = {
-        'Email': email,
-        'NewPass': newPass,
-      };
-
+  Future<void> ResetPassword(String newEmail, String newPass) async {
+    try {
+      const String rstPwdURI =
+          'http://salvagefinancial.xyz:5000/api/ResetPassword';
       final response = await http.post(
         Uri.parse(rstPwdURI),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        encoding: Encoding.getByName("utf-8"),
-        body: jsonEncode(requestBody),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'Email': newEmail, 'Password': newPass}),
       );
 
-
-        if(response.statusCode == 200){
-          
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        String result = responseData['Result'] ?? "Unknown error";
+        if (result != 'Changed password of user') {
+          throw Exception('Password Change Failed Check info');
         }
-        else{
-
-        }
-    }
-    catch (e){
+      } else {}
+    } catch (e) {
       _errorMessage = '';
-    }
-    finally{
+    } finally {
       notifyListeners();
     }
   }
 
-  Future<void> AddInitial(int InitialDebt, int InitialAmount) async{
-    const Result = "Could not add amount and debt";
-    try{
+  Future<void> AddInitial(int InitialDebt, int InitialAmount) async {
+    _errorMessage = '';
+    try {
+      const String addInitURL =
+          'http://salvagefinancial.xyz:5000/api/AddInitial';
+      final response = await http.post(
+        Uri.parse(addInitURL),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          '_id': _userID,
+          'InitialDebt': InitialDebt,
+          'InitialAmount': InitialAmount,
+        }),
+      );
 
-    }
-    catch(e){
+      final responseData = json.decode(response.body);
+      if (response.statusCode != 200) {
+        _errorMessage =
+            responseData['message'] ??
+            (responseData['error'] ?? 'Error adding info');
+      }
+    } catch (e) {
       _errorMessage = 'Could Not add amount and debt';
-    }
-    finally{
+    } finally {
       notifyListeners();
     }
   }
 
-  Future<void> AddIncome(String Name, int Amount, bool ifReccuring ) async{}
+  Future<void> AddIncome(
+    String Name,
+    int Amount,
+    bool ifReccuring, {
+    String? InitialTime,
+    String? timeFrame,
+  }) async {
+    final String addIncomeURL =
+        'http://salvagefinancial.xyz:5000/api/AddIncome';
+    try {
+      _errorMessage = '';
 
-  Future<void> AddExpense(String Name, int Amount, String Catagory) async {}
+      final response = await http.post(
+        Uri.parse(addIncomeURL),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        encoding: Encoding.getByName("utf-8"),
+        body: jsonEncode({
+          '_id': _userID,
+          'Name': Name,
+          'Amount': Amount,
+          'IfReccuring': ifReccuring,
+          if (InitialTime != null) 'InittialTime': InitialTime,
+          if (timeFrame != null) 'timeFrame': timeFrame,
+        }),
+      );
+      final responseData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        _errorMessage = "Success: ${responseData['Result']}";
+      } else {
+        _errorMessage = "⚠️ Error: ${responseData['Result']}";
+      }
+    } catch (e) {
+      _errorMessage = "Failed to Add Income";
+    }
+  }
 
-  Future<void> EditIncome(String temp) async {}
+  Future<void> AddExpense(
+    String Name,
+    String Catagory,
+    int Amount,
+    bool IfReccuring, {
+    String? InitialTime,
+    String? timeFrame,
+  }) async {
+    _errorMessage = '';
+    final String addExpenseURL =
+        'http://salvagefinancial.xyz:5000/api/AddExpense';
+    try {
+      final response = await http.post(
+        Uri.parse(addExpenseURL),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        encoding: Encoding.getByName("utf-8"),
+        body: jsonEncode({
+          '_id': _userID,
+          'Name': Name,
+          'Amount': Amount,
+          'IfReccuring': IfReccuring,
+          if (InitialTime != null) 'InittialTime': InitialTime,
+          if (timeFrame != null) 'timeFrame': timeFrame,
+        }),
+      );
+      final responseData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        _errorMessage = "Success: ${responseData['Result']}";
+      } else {
+        _errorMessage = "Error: ${responseData['Result']}";
+      }
+    } catch (e) {
+      _errorMessage = 'Failed to add expense';
+    }
+  }
+
+  Future<void> EditIncome(
+    String newName,
+    int index,
+    int newAmount,
+    bool newIfReccuring, {
+    String? newInitialTime,
+    String? newTimeFrame,
+  }) async {
+    _errorMessage = '';
+    final String editIncomeURL =
+        'http://salvagefinancial.xyz:5000/api/EditIncome';
+
+    try {
+      final response = await http.post(
+        Uri.parse(editIncomeURL),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        encoding: Encoding.getByName("utf-8"),
+        body: jsonEncode({
+          '_id': _userID,
+          'Name': newName,
+          'index': index,
+          'Amount': newAmount,
+          'IfReccuring': newIfReccuring,
+          if (newInitialTime != null) 'InittialTime': newInitialTime,
+          if (newTimeFrame != null) 'timeFrame': newTimeFrame,
+        }),
+      );
+      final responseData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        _errorMessage = "Success: ${responseData['Result']}";
+      } else {
+        _errorMessage = "⚠️ Error: ${responseData['Result']}";
+      }
+    } catch (e) {
+      _errorMessage = "Failed to edit income";
+    }
+  }
+
+  Future<void> EditExpense(
+    String newName,
+    int index,
+    int newAmount,
+    String newCatagory,
+    bool newIfReccuring, {
+    String? newInitialTime,
+    String? newTimeFrame,
+  }) async {
+    _errorMessage = '';
+    final String editExpenseURL =
+        'http://salvagefinancial.xyz:5000/api/EditExpense';
+
+    try {
+      final response = await http.post(
+        Uri.parse(editExpenseURL),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        encoding: Encoding.getByName("utf-8"),
+        body: jsonEncode({
+          '_id': _userID,
+          'Name': newName,
+          'index': index,
+          'Amount': newAmount,
+          'IfReccuring': newIfReccuring,
+          if (newInitialTime != null) 'InittialTime': newInitialTime,
+          if (newTimeFrame != null) 'timeFrame': newTimeFrame,
+        }),
+      );
+      final responseData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        _errorMessage = "Success: ${responseData['Result']}";
+      } else {
+        _errorMessage = "⚠️ Error: ${responseData['Result']}";
+      }
+    } catch (e) {
+      _errorMessage = "Failed to edit income";
+    }
+  }
+
+  Future<void> DeleteIncome(int index) async {
+    _errorMessage = '';
+    final String deleteIncmURL =
+        'http://salvagefinancial.xyz:5000/api/DeleteIncome';
+
+    try {
+      final response = await http.post(
+        Uri.parse(deleteIncmURL),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({'_id': _userID, 'index': index}),
+      );
+      final responseData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        _errorMessage = "Success: ${responseData['Result']}";
+      } else {
+        _errorMessage = "⚠️ Error: ${responseData['Result']}";
+      }
+    } catch (e) {
+      _errorMessage = 'Could Not Delete Income';
+    }
+  }
+
+  Future<void> DeleteExpense(int index) async {
+    _errorMessage = '';
+    final String deleteExpenseURL =
+        'http://salvagefinancial.xyz:5000/api/DeleteExpense';
+
+    try {
+      final response = await http.post(
+        Uri.parse(deleteExpenseURL),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({'_id': _userID, 'index': index}),
+      );
+      final responseData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        _errorMessage = "Success: ${responseData['Result']}";
+      } else {
+        _errorMessage = "⚠️ Error: ${responseData['Result']}";
+      }
+    } catch (e) {
+      _errorMessage = 'Could Not Delete Income';
+    }
+  }
+
+  Future<void> ShowAllInfo() async {
+    _errorMessage = '';
+    final String ShowAllInfoURL =
+        'http://salvagefinancial.xyz:5000/api/ShowAllInfo';
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://YOUR_LOCAL_IP:5000/api/ShowAllInfo'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({
+          "_id": _userID, // Pass user ID from stored session
+        }),
+      );
+
+      final responseData = json.decode(response.body);
+      print("Fetch User Info Response: ${response.body}"); // Debugging
+
+      if (response.statusCode == 200 &&
+          responseData['Result'] == "Found user") {
+        return responseData['User']; // Return user object
+      } else {
+        print("⚠️ Error: ${responseData['Result']}");
+        return null;
+      }
+    } catch (e) {
+      _errorMessage = 'Could not display all user info';
+    }
+  }
 }
