@@ -111,7 +111,7 @@ class AuthProvider with ChangeNotifier {
           'http://salvagefinancial.xyz:5000/api/ResetPassword';
       final response = await http.post(
         Uri.parse(rstPwdURI),
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $_jwtToken'},
         body: json.encode({'Email': newEmail, 'Password': newPass}),
       );
 
@@ -138,7 +138,7 @@ class AuthProvider with ChangeNotifier {
           'http://salvagefinancial.xyz:5000/api/AddInitial';
       final response = await http.post(
         Uri.parse(addInitURL),
-        headers: {'Content-Type': 'application/json', 'Authorization': _jwtToken},
+        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $_jwtToken'},
         body: json.encode({
           'InitialDebt': InitialDebt,
           'InitialAmount': InitialAmount,
@@ -179,6 +179,7 @@ class AuthProvider with ChangeNotifier {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Authorization': 'Bearer $_jwtToken'
         },
         encoding: Encoding.getByName("utf-8"),
         body: jsonEncode({
@@ -217,6 +218,7 @@ class AuthProvider with ChangeNotifier {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Authorization': 'Bearer $_jwtToken'
         },
         encoding: Encoding.getByName("utf-8"),
         body: jsonEncode({
@@ -256,6 +258,7 @@ class AuthProvider with ChangeNotifier {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Authorization': 'Bearer $_jwtToken'
         },
         encoding: Encoding.getByName("utf-8"),
         body: jsonEncode({
@@ -297,6 +300,7 @@ class AuthProvider with ChangeNotifier {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Authorization': 'Bearer $_jwtToken'
         },
         encoding: Encoding.getByName("utf-8"),
         body: jsonEncode({
@@ -330,6 +334,7 @@ class AuthProvider with ChangeNotifier {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Authorization': 'Bearer $_jwtToken'
         },
         body: jsonEncode({'index': index}),
       );
@@ -355,6 +360,7 @@ class AuthProvider with ChangeNotifier {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Authorization': 'Bearer $_jwtToken'
         },
         body: jsonEncode({'index': index}),
       );
@@ -380,6 +386,7 @@ class AuthProvider with ChangeNotifier {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Authorization': 'Bearer $_jwtToken'
         },
         body: jsonEncode({
         }),

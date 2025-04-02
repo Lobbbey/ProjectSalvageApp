@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/LoginScreen.dart';
-import 'package:flutter_application_1/screens/CardsScreen.dart';
 import 'package:flutter_application_1/screens/IncomeScreen.dart';
 import 'package:flutter_application_1/screens/ExpenseScreen.dart';
 import 'package:flutter_application_1/screens/AnalyticsScreen.dart';
@@ -10,7 +9,6 @@ import 'package:flutter_application_1/screens/AddInitialScreen.dart';
 
 class Routes {
   static const String LOGINSCREEN = '/login';
-  static const String CARDSSCREEN = '/cards';
   static const String INCOMESCREEN = '/income';
   static const String EXPENSESCREEN = '/expense';
   static const String ANALYTICSSCREEN = '/analytics';
@@ -25,7 +23,6 @@ class Routes {
     HOMESCREEN: (context) => HomeScreen(),
     LOGINSCREEN: (context) => LoginScreen(),
     ADDINITIALSCREEN: (context) => AddInitialScreen(),
-    CARDSSCREEN: (context) => CardsScreen(),
     SIGNUPSCREEN: (context) => SignUpScreen(),
     INCOMESCREEN: (context) => IncomeScreen(),
     EXPENSESCREEN: (context) => ExpenseScreen(),
