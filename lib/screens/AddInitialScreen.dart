@@ -3,28 +3,21 @@ import 'package:flutter_application_1/AuthProvider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_1/screens/HomeScreen.dart';
 
-class LoginScreen extends StatefulWidget {
+class AddInitialScreen extends StatefulWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _AddInitialScreen createState() => _AddInitialScreen();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  bool _isLoading = false;
-
-  @override
-  void dispose(){
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
+class _AddInitialScreen extends State<AddInitialScreen> {
+  final TextEditingController _initialDebtController = TextEditingController();
+  final TextEditingController _initialAmountController = TextEditingController();
+   bool _isLoading = false;
+  
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
 
-    if (authProvider.errorMessage.isNotEmpty && !_isLoading) {
+    if (authProvider.errorMessage.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -50,7 +43,6 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
       drawer: CustomDrawer(),
-      backgroundColor: Colors.grey,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -63,73 +55,59 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  //Login
                   SizedBox(
                     width: 250,
                     child: TextField(
-                      controller: _emailController,
+                      controller: _initialDebtController,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(),
-                        labelText: 'Login',
-                        hintText: 'Enter Your Email',
+                        labelText: 'InitialDebt',
+                        hintText: 'Enter Your Initial Debt',
                       ),
-                      keyboardType: TextInputType.emailAddress,
+                      keyboardType: TextInputType.number,
                     ),
                   ),
-                  SizedBox(height: 10),
-                  //Password
                   SizedBox(
                     width: 250,
                     child: TextField(
-                      controller: _passwordController,
+                      controller: _initialAmountController,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(),
-                        labelText: 'Password',
-                        hintText: 'Enter Your Password',
+                        labelText: 'InitialAmount',
+                        hintText: 'Enter Your Initial Amount',
                       ),
-                      obscureText: true,
+                      keyboardType: TextInputType.number,
                     ),
                   ),
-                  SizedBox(height: 10),
                   _isLoading
                     ? CircularProgressIndicator()
                     : ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 10,
-                      ),
-                    ),
                     onPressed: () async {
                       setState(() => _isLoading = true);
-                        await authProvider.login(
-                          _emailController.text.trim(),
-                          _passwordController.text.trim(),
-                        );
-
-                        setState(() => _isLoading = false);
-
-                        if (authProvider.isLoggedIn) {
-                              Navigator.pushNamed(context, '/initial');
+                        try {
+                            // Parse inputs to integers
+                            final initialDebt = int.tryParse(_initialDebtController.text) ?? 0;
+                            final initialAmount = int.tryParse(_initialAmountController.text) ?? 0;
+                            
+                            await authProvider.AddInitial(initialDebt, initialAmount);
+                            
+                            if (authProvider.addedInitial) {
+                              Navigator.pushNamed(context, '/analytics');
                             }
+                          } finally {
+                            setState(() => _isLoading = false);
+                          }
                     },
                     child: Text(
-                      'Login',
+                      'Add',
                       style: TextStyle(fontSize: 16, color: Colors.black),
                     ),
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      Navigator.pushNamed(context, '/signup');
-                    },
-                    child: Text('Don\'t have an account?\n Sign Up'),
-                  ),
-                ],
+                    ),
+                ]
               ),
             ),
           ),

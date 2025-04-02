@@ -1,20 +1,23 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:jwt_decoder/jwt_decoder.dart';
+
 
 class AuthProvider with ChangeNotifier {
   bool _isLoggedIn = false;
   String _errorMessage = '';
-  int _userID = 0;
+  bool _addedInitial = false;
+  String _jwtToken = '';
 
   bool get isLoggedIn => _isLoggedIn;
+  bool get addedInitial => _addedInitial;
   String get errorMessage => _errorMessage;
+  String get jwtToken => _jwtToken;
 
-  final String loginUrl = 'http://salvagefinancial.xyz:5000/api/Login';
 
   Future<void> login(String email, String password) async {
     try {
+      final String loginUrl = 'http://salvagefinancial.xyz:5000/api/Login';
       _errorMessage = '';
       notifyListeners();
 
@@ -34,11 +37,8 @@ class AuthProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         if (responseData['Result'] == 'Found user' &&
             responseData['token'] != null) {
-          String jwtToken = responseData['token'];
-          Map<String, dynamic> decodedToken = JwtDecoder.decode(jwtToken);
-          int userID = decodedToken['_id']; // Extracted user ID
+          _jwtToken = responseData['token'];
           _isLoggedIn = true;
-          _userID = userID;
           _errorMessage = '';
         } else {
           _errorMessage =
@@ -102,7 +102,6 @@ class AuthProvider with ChangeNotifier {
   void logout() {
     _isLoggedIn = false;
     _errorMessage = '';
-    _userID = 0;
     notifyListeners();
   }
 
@@ -132,27 +131,32 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> AddInitial(int InitialDebt, int InitialAmount) async {
     _errorMessage = '';
+    _addedInitial = false;
+    print(jwtToken);
     try {
       const String addInitURL =
           'http://salvagefinancial.xyz:5000/api/AddInitial';
       final response = await http.post(
         Uri.parse(addInitURL),
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json', 'Authorization': _jwtToken},
         body: json.encode({
-          '_id': _userID,
           'InitialDebt': InitialDebt,
           'InitialAmount': InitialAmount,
         }),
       );
 
       final responseData = json.decode(response.body);
-      if (response.statusCode != 200) {
-        _errorMessage =
-            responseData['message'] ??
-            (responseData['error'] ?? 'Error adding info');
+      if (response.statusCode == 200) {
+        _addedInitial = true; 
+        _errorMessage = ''; 
+      } else {
+        _addedInitial = false;
+        _errorMessage = responseData['message'] ?? 
+                       (responseData['error'] ?? 'Error adding info');
       }
     } catch (e) {
       _errorMessage = 'Could Not add amount and debt';
+      return;
     } finally {
       notifyListeners();
     }
@@ -178,7 +182,6 @@ class AuthProvider with ChangeNotifier {
         },
         encoding: Encoding.getByName("utf-8"),
         body: jsonEncode({
-          '_id': _userID,
           'Name': Name,
           'Amount': Amount,
           'IfReccuring': ifReccuring,
@@ -217,7 +220,6 @@ class AuthProvider with ChangeNotifier {
         },
         encoding: Encoding.getByName("utf-8"),
         body: jsonEncode({
-          '_id': _userID,
           'Name': Name,
           'Amount': Amount,
           'IfReccuring': IfReccuring,
@@ -257,7 +259,6 @@ class AuthProvider with ChangeNotifier {
         },
         encoding: Encoding.getByName("utf-8"),
         body: jsonEncode({
-          '_id': _userID,
           'Name': newName,
           'index': index,
           'Amount': newAmount,
@@ -299,7 +300,6 @@ class AuthProvider with ChangeNotifier {
         },
         encoding: Encoding.getByName("utf-8"),
         body: jsonEncode({
-          '_id': _userID,
           'Name': newName,
           'index': index,
           'Amount': newAmount,
@@ -331,7 +331,7 @@ class AuthProvider with ChangeNotifier {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        body: jsonEncode({'_id': _userID, 'index': index}),
+        body: jsonEncode({'index': index}),
       );
       final responseData = json.decode(response.body);
       if (response.statusCode == 200) {
@@ -356,7 +356,7 @@ class AuthProvider with ChangeNotifier {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        body: jsonEncode({'_id': _userID, 'index': index}),
+        body: jsonEncode({'index': index}),
       );
       final responseData = json.decode(response.body);
       if (response.statusCode == 200) {
@@ -382,7 +382,6 @@ class AuthProvider with ChangeNotifier {
           'Accept': 'application/json',
         },
         body: jsonEncode({
-          "_id": _userID, // Pass user ID from stored session
         }),
       );
 

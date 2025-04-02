@@ -9,6 +9,16 @@ class SignUpScreen extends StatelessWidget {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
 
+  // Email regex pattern
+  static final RegExp _emailRegExp = RegExp(
+    r'^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$',
+  );
+
+  // Password regex pattern (at least 8 characters, 1 uppercase, 1 lowercase, 1 number)
+  static final RegExp _passwordRegExp = RegExp(
+    r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$',
+  );
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
@@ -51,7 +61,14 @@ class SignUpScreen extends StatelessWidget {
               controller: _emailController,
               decoration: InputDecoration(
                 labelText: 'Email',
+                errorText: _emailController.text.isNotEmpty && !_emailRegExp.hasMatch(_emailController.text)
+                    ? 'Please enter a valid email'
+                    : null,
               ),
+              onChanged: (value) {
+                // Trigger rebuild when email changes to show/hide error
+                (context as Element).markNeedsBuild();
+              },
             ),
             SizedBox(height: 16.0),
             TextField(
@@ -59,21 +76,56 @@ class SignUpScreen extends StatelessWidget {
               obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Password',
+                errorText: _passwordController.text.isNotEmpty && !_passwordRegExp.hasMatch(_passwordController.text)
+                    ? 'Password must be at least 8 characters with at least one letter and one number'
+                    : null,
               ),
+              onChanged: (value) {
+                // Trigger rebuild when password changes to show/hide error
+                (context as Element).markNeedsBuild();
+              },
             ),
             SizedBox(height: 24.0),
             ElevatedButton(
               onPressed: () async {
+                // Validate fields before proceeding
+                if (!_emailRegExp.hasMatch(_emailController.text)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Please enter a valid email address'),
+                    ),
+                  );
+                  return;
+                }
+
+                if (!_passwordRegExp.hasMatch(_passwordController.text)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Password must be at least 8 characters with at least one letter and one number'),
+                    ),
+                  );
+                  return;
+                }
+
+                if (_firstNameController.text.isEmpty || _lastNameController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Please enter your first and last name'),
+                    ),
+                  );
+                  return;
+                }
+
                 try {
                   // Call the API for sign-up
                   await authProvider.signUp(
-                    _firstNameController.text,
-                    _lastNameController.text,
-                    _emailController.text,
-                    _passwordController.text,
+                    _firstNameController.text.trim(),
+                    _lastNameController.text.trim(),
+                    _emailController.text.trim(),
+                    _passwordController.text.trim(),
                   );
                   // Navigate to the home page after successful sign-up
-                  Navigator.pushReplacementNamed(context, '/home');
+                  Navigator.pushReplacementNamed(context, '/login');
                 } catch (e) {
                   // Show error message
                   ScaffoldMessenger.of(context).showSnackBar(

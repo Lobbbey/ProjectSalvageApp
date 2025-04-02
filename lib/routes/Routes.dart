@@ -6,6 +6,7 @@ import 'package:flutter_application_1/screens/ExpenseScreen.dart';
 import 'package:flutter_application_1/screens/AnalyticsScreen.dart';
 import 'package:flutter_application_1/screens/SignUpScreen.dart';
 import 'package:flutter_application_1/screens/HomeScreen.dart';
+import 'package:flutter_application_1/screens/AddInitialScreen.dart';
 
 class Routes {
   static const String LOGINSCREEN = '/login';
@@ -15,6 +16,7 @@ class Routes {
   static const String ANALYTICSSCREEN = '/analytics';
   static const String HOMESCREEN = '/home';
   static const String SIGNUPSCREEN = '/signup';
+  static const String ADDINITIALSCREEN = '/initial';
 
 
   // routes of pages in the app
@@ -22,6 +24,7 @@ class Routes {
     '/': (context) => HomeScreen(),
     HOMESCREEN: (context) => HomeScreen(),
     LOGINSCREEN: (context) => LoginScreen(),
+    ADDINITIALSCREEN: (context) => AddInitialScreen(),
     CARDSSCREEN: (context) => CardsScreen(),
     SIGNUPSCREEN: (context) => SignUpScreen(),
     INCOMESCREEN: (context) => IncomeScreen(),
