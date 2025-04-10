@@ -3,71 +3,69 @@ import 'HomeScreen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_1/AuthProvider.dart';
 
-class ExpenseScreen extends StatefulWidget {
+class SavingScreen extends StatefulWidget {
   @override
-  _ExpenseScreenState createState() => _ExpenseScreenState();
+  _SavingScreenState createState() => _SavingScreenState();
 }
 
-class _ExpenseScreenState extends State<ExpenseScreen> {
+class _SavingScreenState extends State<SavingScreen> {
   final TextEditingController _NameController = TextEditingController();
   final TextEditingController _AmountController = TextEditingController();
-  final TextEditingController _CategoryController = TextEditingController();
+  final TextEditingController _APRController = TextEditingController();
   final TextEditingController _InitialTimeController = TextEditingController();
   bool _isLoading = false;
-  bool _isRecurring = false;
   String _alertMessage = '';
-  bool _loadingExpenses = false;
+  bool _loadingSaving = false;
   int? _editingIndex;
 
   @override
   void initState() {
     super.initState();
-    _loadExpenses();
+    _loadSavings();
   }
 
-  Future<void> _loadExpenses() async {
+  Future<void> _loadSavings() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    setState(() => _loadingExpenses = true);
+    setState(() => _loadingSaving = true);
     try {
       await authProvider.ShowAllInfo();
     } finally {
-      setState(() => _loadingExpenses = false);
+      setState(() => _loadingSaving = false);
     }
   }
 
-  Future<void> _deleteExpense(int index) async {
+  Future<void> _deleteSaving(int index) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     setState(() => _isLoading = true);
     try {
-      await authProvider.DeleteExpense(index);
-      await _loadExpenses();
+      await authProvider.DeleteSaving(index);
+      await _loadSavings();
       setState(() {
-        _alertMessage = 'Expense deleted successfully';
+        _alertMessage = 'Saving deleted successfully';
         _clearForm();
       });
     } catch (e) {
-      setState(() => _alertMessage = 'Failed to delete expense');
+      setState(() => _alertMessage = 'Failed to delete Saving');
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
-  void _editExpense(int index) {
-    final expenses =
+  void _editSaving(int index) {
+    final savings =
         Provider.of<AuthProvider>(
           context,
           listen: false,
-        ).userData?['Expenses'] ??
+        ).userData?['Savings'] ??
         [];
-    if (index >= 0 && index < expenses.length) {
-      final expense = expenses[index];
-      _NameController.text = expense['Name'];
-      _AmountController.text = expense['Amount'].toString();
-      _CategoryController.text = expense['Category'];
+    if (index >= 0 && index < savings.length) {
+      final saving = savings[index];
+      _NameController.text = saving['Name'];
+      _AmountController.text = saving['Amount'].toString();
+      _APRController.text = saving['APR'];
       _InitialTimeController.text =
-          '${expense['InitialTime']['Month']}/${expense['InitialTime']['Day']}/${expense['InitialTime']['Year']}';
+          '${saving['InitialTime']['Month']}/${saving['InitialTime']['Day']}/${saving['InitialTime']['Year']}';
       setState(() {
-        _isRecurring = expense['IfRecurring'];
         _editingIndex = index;
       });
     }
@@ -75,11 +73,10 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
   void _clearForm() {
     _NameController.clear();
-    _CategoryController.clear();
+    _APRController.clear();
     _AmountController.clear();
     _InitialTimeController.clear();
     setState(() {
-      _isRecurring = false;
       _editingIndex = null;
     });
   }
@@ -87,7 +84,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
-    final expenses = authProvider.userData?['Expenses'] ?? [];
+    final savings = authProvider.userData?['Savings'] ?? [];
 
     return Scaffold(
       appBar: AppBar(
@@ -105,7 +102,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Expense Form
+            // Saving Form
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
@@ -118,7 +115,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(),
-                          labelText: 'Expense Name',
+                          labelText: 'Saving Name',
                         ),
                       ),
                       SizedBox(height: 5),
@@ -134,13 +131,13 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                       ),
                       SizedBox(height: 5),
                       TextField(
-                        controller: _CategoryController,
+                        controller: _APRController,
                         keyboardType: TextInputType.text,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(),
-                          labelText: 'Category',
+                          labelText: 'APR',
                         ),
                       ),
                       SizedBox(height: 5),
@@ -166,30 +163,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                         },
                       ),
                       SizedBox(height: 5),
-                      Row(
-                        children: [
-                          Text(
-                            'Recurring:',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          Radio(
-                            value: true,
-                            groupValue: _isRecurring,
-                            onChanged:
-                                (value) =>
-                                    setState(() => _isRecurring = value!),
-                          ),
-                          Text('Yes', style: TextStyle(color: Colors.white)),
-                          Radio(
-                            value: false,
-                            groupValue: _isRecurring,
-                            onChanged:
-                                (value) =>
-                                    setState(() => _isRecurring = value!),
-                          ),
-                          Text('No', style: TextStyle(color: Colors.white)),
-                        ],
-                      ),
                       if (_alertMessage.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -204,7 +177,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                 ? null
                                 : () async {
                                   if (_NameController.text.isEmpty ||
-                                      _CategoryController.text.isEmpty ||
+                                      _APRController.text.isEmpty ||
                                       _AmountController.text.isEmpty ||
                                       _InitialTimeController.text.isEmpty) {
                                     setState(
@@ -230,12 +203,11 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                     }
 
                                     if (_editingIndex != null) {
-                                      await authProvider.EditExpense(
+                                      await authProvider.EditSaving(
                                         _NameController.text,
                                         _editingIndex!,
                                         int.parse(_AmountController.text),
-                                        _CategoryController.text,
-                                        _isRecurring,
+                                        _APRController.text,
                                         InitialTime: {
                                           'Month': int.parse(dateParts[0]),
                                           'Day': int.parse(dateParts[1]),
@@ -243,11 +215,10 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                         },
                                       );
                                     } else {
-                                      await authProvider.AddExpense(
+                                      await authProvider.AddSaving(
                                         _NameController.text,
                                         int.parse(_AmountController.text),
-                                        _CategoryController.text,
-                                        _isRecurring,
+                                        _APRController.text,
                                         InitialTime: {
                                           'Month': int.parse(dateParts[0]),
                                           'Day': int.parse(dateParts[1]),
@@ -255,12 +226,12 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                         },
                                       );
                                     }
-                                    await _loadExpenses();
+                                    await _loadSavings();
                                     setState(() {
                                       _alertMessage =
                                           _editingIndex != null
-                                              ? 'Expense updated successfully'
-                                              : 'Expense added successfully';
+                                              ? 'Savings updated successfully'
+                                              : 'Savings added successfully';
                                       _clearForm();
                                     });
                                   } catch (e) {
@@ -278,8 +249,8 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                 ? CircularProgressIndicator(color: Colors.white)
                                 : Text(
                                   _editingIndex != null
-                                      ? 'Update Expense'
-                                      : 'Add Expense',
+                                      ? 'Update Savings'
+                                      : 'Add Savings',
                                 ),
                       ),
                     ],
@@ -288,7 +259,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
               ),
             ),
 
-            // Expense List
+            // Saving List
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
@@ -299,29 +270,29 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                   ),
                 ),
                 child:
-                    _loadingExpenses
+                    _loadingSaving
                         ? Center(child: CircularProgressIndicator())
-                        : expenses.isEmpty
-                        ? Center(child: Text('No Expense yet'))
+                        : savings.isEmpty
+                        ? Center(child: Text('No Saving yet'))
                         : ListView.builder(
-                          itemCount: expenses.length,
+                          itemCount: savings.length,
                           itemBuilder: (context, index) {
-                            final expense = expenses[index];
+                            final saving = savings[index];
                             return ListTile(
-                              title: Text(expense['Name']),
+                              title: Text(saving['Name']),
                               subtitle: Text(
-                                '${expense['Category']} • \$${expense['Amount']} • ${expense['InitialTime']['Month']}/${expense['InitialTime']['Day']}/${expense['InitialTime']['Year']}',
+                                '${saving['APR']} • \$${saving['Amount']} • ${saving['InitialTime']['Month']}/${saving['InitialTime']['Day']}/${saving['InitialTime']['Year']}',
                               ),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
                                     icon: Icon(Icons.edit, color: Colors.blue),
-                                    onPressed: () => _editExpense(index),
+                                    onPressed: () => _editSaving(index),
                                   ),
                                   IconButton(
                                     icon: Icon(Icons.delete, color: Colors.red),
-                                    onPressed: () => _deleteExpense(index),
+                                    onPressed: () => _deleteSaving(index),
                                   ),
                                 ],
                               ),

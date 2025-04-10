@@ -14,9 +14,9 @@ class SignUpScreen extends StatelessWidget {
     r'^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$',
   );
 
-  // Password regex pattern (at least 8 characters, 1 uppercase, 1 lowercase, 1 number)
+  // Password regex pattern ( At least 1 number, 1 symbol, and a minimum of 8 characters)
   static final RegExp _passwordRegExp = RegExp(
-    r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$',
+    r'^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>])[a-zA-Z0-9!@#$%^&*(),.?":{}|<>]{8,}$',
   );
 
   @override
@@ -77,7 +77,7 @@ class SignUpScreen extends StatelessWidget {
               decoration: InputDecoration(
                 labelText: 'Password',
                 errorText: _passwordController.text.isNotEmpty && !_passwordRegExp.hasMatch(_passwordController.text)
-                    ? 'Password must be at least 8 characters with at least one letter and one number'
+                    ? 'Password must be at least 8 characters with at least one symbol and one number'
                     : null,
               ),
               onChanged: (value) {

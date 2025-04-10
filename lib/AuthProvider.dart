@@ -2,18 +2,18 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-
 class AuthProvider with ChangeNotifier {
   bool _isLoggedIn = false;
   String _errorMessage = '';
   bool _addedInitial = false;
   String _jwtToken = '';
+  Map<String, dynamic>? _userData;
 
+  Map<String, dynamic>? get userData => _userData;
   bool get isLoggedIn => _isLoggedIn;
   bool get addedInitial => _addedInitial;
   String get errorMessage => _errorMessage;
   String get jwtToken => _jwtToken;
-
 
   Future<void> login(String email, String password) async {
     try {
@@ -38,6 +38,7 @@ class AuthProvider with ChangeNotifier {
         if (responseData['Result'] == 'Found user' &&
             responseData['token'] != null) {
           _jwtToken = responseData['token'];
+          print(_jwtToken);
           _isLoggedIn = true;
           _errorMessage = '';
         } else {
@@ -111,7 +112,10 @@ class AuthProvider with ChangeNotifier {
           'http://salvagefinancial.xyz:5000/api/ResetPassword';
       final response = await http.post(
         Uri.parse(rstPwdURI),
-        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $_jwtToken'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_jwtToken',
+        },
         body: json.encode({'Email': newEmail, 'Password': newPass}),
       );
 
@@ -138,7 +142,10 @@ class AuthProvider with ChangeNotifier {
           'http://salvagefinancial.xyz:5000/api/AddInitial';
       final response = await http.post(
         Uri.parse(addInitURL),
-        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $_jwtToken'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_jwtToken',
+        },
         body: json.encode({
           'InitialDebt': InitialDebt,
           'InitialAmount': InitialAmount,
@@ -147,12 +154,13 @@ class AuthProvider with ChangeNotifier {
 
       final responseData = json.decode(response.body);
       if (response.statusCode == 200) {
-        _addedInitial = true; 
-        _errorMessage = ''; 
+        _addedInitial = true;
+        _errorMessage = '';
       } else {
         _addedInitial = false;
-        _errorMessage = responseData['message'] ?? 
-                       (responseData['error'] ?? 'Error adding info');
+        _errorMessage =
+            responseData['message'] ??
+            (responseData['error'] ?? 'Error adding info');
       }
     } catch (e) {
       _errorMessage = 'Could Not add amount and debt';
@@ -165,49 +173,58 @@ class AuthProvider with ChangeNotifier {
   Future<void> AddIncome(
     String Name,
     int Amount,
-    bool ifReccuring, {
-    String? InitialTime,
-    String? timeFrame,
+    bool IfRecurring, {
+    required Map<String, int> InitialTime,
   }) async {
     final String addIncomeURL =
         'http://salvagefinancial.xyz:5000/api/AddIncome';
+
     try {
       _errorMessage = '';
+
+      final Map<String, dynamic> requestBody = {
+        'Name': Name,
+        'Amount': Amount,
+        'IfRecurring': IfRecurring,
+        'InitialTime': {
+          'Month': InitialTime['Month'],
+          'Day': InitialTime['Day'],
+          'Year': InitialTime['Year'],
+        },
+      };
 
       final response = await http.post(
         Uri.parse(addIncomeURL),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization': 'Bearer $_jwtToken'
+          'Authorization': 'Bearer $_jwtToken',
         },
-        encoding: Encoding.getByName("utf-8"),
-        body: jsonEncode({
-          'Name': Name,
-          'Amount': Amount,
-          'IfReccuring': ifReccuring,
-          if (InitialTime != null) 'InittialTime': InitialTime,
-          if (timeFrame != null) 'timeFrame': timeFrame,
-        }),
+        body: jsonEncode(requestBody),
       );
+
       final responseData = json.decode(response.body);
+
       if (response.statusCode == 200) {
-        _errorMessage = "Success: ${responseData['Result']}";
+        _errorMessage = "";
+        return;
       } else {
-        _errorMessage = "⚠️ Error: ${responseData['Result']}";
+        _errorMessage =
+            "⚠️ Error: ${responseData['Result'] ?? 'Unknown error (Status ${response.statusCode})'}";
+        return;
       }
     } catch (e) {
-      _errorMessage = "Failed to Add Income";
+      _errorMessage = "Failed to Add Income: ${e.toString()}";
+      return;
     }
   }
 
   Future<void> AddExpense(
     String Name,
-    String Catagory,
     int Amount,
-    bool IfReccuring, {
-    String? InitialTime,
-    String? timeFrame,
+    String Category,
+    bool IfRecurring, {
+    required Map<String, int> InitialTime,
   }) async {
     _errorMessage = '';
     final String addExpenseURL =
@@ -218,25 +235,122 @@ class AuthProvider with ChangeNotifier {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization': 'Bearer $_jwtToken'
+          'Authorization': 'Bearer $_jwtToken',
         },
         encoding: Encoding.getByName("utf-8"),
         body: jsonEncode({
           'Name': Name,
           'Amount': Amount,
-          'IfReccuring': IfReccuring,
-          if (InitialTime != null) 'InittialTime': InitialTime,
-          if (timeFrame != null) 'timeFrame': timeFrame,
+          'Category': Category,
+          'IfRecurring': IfRecurring,
+          'InitialTime': {
+          'Month': InitialTime['Month'],
+          'Day': InitialTime['Day'],
+          'Year': InitialTime['Year'],
+        },
         }),
       );
       final responseData = json.decode(response.body);
       if (response.statusCode == 200) {
-        _errorMessage = "Success: ${responseData['Result']}";
+        _errorMessage = "";
+        return;
       } else {
         _errorMessage = "Error: ${responseData['Result']}";
+        return;
       }
     } catch (e) {
       _errorMessage = 'Failed to add expense';
+      return;
+    }
+  }
+
+  Future<void> AddSaving(
+    String Name,
+    int Amount,
+    String APR, {
+    required Map<String, int> InitialTime,
+  }) async {
+    _errorMessage = '';
+    final String addSavingURL =
+        'http://salvagefinancial.xyz:5000/api/AddSaving';
+    try {
+      final response = await http.post(
+        Uri.parse(addSavingURL),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $_jwtToken',
+        },
+        encoding: Encoding.getByName("utf-8"),
+        body: jsonEncode({
+          'Name': Name,
+          'Amount': Amount,
+          'APR': APR,
+          'InitialTime': {
+          'Month': InitialTime['Month'],
+          'Day': InitialTime['Day'],
+          'Year': InitialTime['Year'],
+        },
+        }),
+      );
+      final responseData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        _errorMessage = "";
+        return;
+      } else {
+        _errorMessage = "Error: ${responseData['Result']}";
+        return;
+      }
+    } catch (e) {
+      _errorMessage = 'Failed to add saving';
+      return;
+    }
+  }
+
+  Future<void> AddDebt(
+    String Name,
+    int Amount,
+    int APR,
+    int Monthly,
+    int LoanLength, {
+    required Map<String, int> InitialTime,
+  }) async {
+    _errorMessage = '';
+    final String addSavingURL =
+        'http://salvagefinancial.xyz:5000/api/AddDebt';
+    try {
+      final response = await http.post(
+        Uri.parse(addSavingURL),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $_jwtToken',
+        },
+        encoding: Encoding.getByName("utf-8"),
+        body: jsonEncode({
+          'Name': Name,
+          'Amount': Amount,
+          'APR': APR,
+          'Monthly': Monthly,
+          'LoanLength': LoanLength,
+          'InitialTime': {
+          'Month': InitialTime['Month'],
+          'Day': InitialTime['Day'],
+          'Year': InitialTime['Year'],
+        },
+        }),
+      );
+      final responseData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        _errorMessage = "";
+        return;
+      } else {
+        _errorMessage = "Error: ${responseData['Result']}";
+        return;
+      }
+    } catch (e) {
+      _errorMessage = 'Failed to add debt';
+      return;
     }
   }
 
@@ -244,9 +358,8 @@ class AuthProvider with ChangeNotifier {
     String newName,
     int index,
     int newAmount,
-    bool newIfReccuring, {
-    String? newInitialTime,
-    String? newTimeFrame,
+    bool newIfRecurring, {
+    required Map<String, int> InitialTime,
   }) async {
     _errorMessage = '';
     final String editIncomeURL =
@@ -258,16 +371,19 @@ class AuthProvider with ChangeNotifier {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization': 'Bearer $_jwtToken'
+          'Authorization': 'Bearer $_jwtToken',
         },
         encoding: Encoding.getByName("utf-8"),
         body: jsonEncode({
           'Name': newName,
           'index': index,
           'Amount': newAmount,
-          'IfReccuring': newIfReccuring,
-          if (newInitialTime != null) 'InittialTime': newInitialTime,
-          if (newTimeFrame != null) 'timeFrame': newTimeFrame,
+          'IfReccuring': newIfRecurring,
+          'InitialTime': {
+          'Month': InitialTime['Month'],
+          'Day': InitialTime['Day'],
+          'Year': InitialTime['Year'],
+          }
         }),
       );
       final responseData = json.decode(response.body);
@@ -285,10 +401,9 @@ class AuthProvider with ChangeNotifier {
     String newName,
     int index,
     int newAmount,
-    String newCatagory,
-    bool newIfReccuring, {
-    String? newInitialTime,
-    String? newTimeFrame,
+    String newCategory,
+    bool newIfRecurring, {
+    required Map<String, int> InitialTime,
   }) async {
     _errorMessage = '';
     final String editExpenseURL =
@@ -300,16 +415,20 @@ class AuthProvider with ChangeNotifier {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization': 'Bearer $_jwtToken'
+          'Authorization': 'Bearer $_jwtToken',
         },
         encoding: Encoding.getByName("utf-8"),
         body: jsonEncode({
           'Name': newName,
           'index': index,
           'Amount': newAmount,
-          'IfReccuring': newIfReccuring,
-          if (newInitialTime != null) 'InittialTime': newInitialTime,
-          if (newTimeFrame != null) 'timeFrame': newTimeFrame,
+          'Category': newCategory,
+          'IfReccuring': newIfRecurring,
+          'InitialTime': {
+          'Month': InitialTime['Month'],
+          'Day': InitialTime['Day'],
+          'Year': InitialTime['Year'],
+          }
         }),
       );
       final responseData = json.decode(response.body);
@@ -319,7 +438,97 @@ class AuthProvider with ChangeNotifier {
         _errorMessage = "⚠️ Error: ${responseData['Result']}";
       }
     } catch (e) {
-      _errorMessage = "Failed to edit income";
+      _errorMessage = "Failed to edit expense";
+    }
+  }
+
+  Future<void> EditSaving(
+    String newName,
+    int index,
+    int newAmount,
+    String newAPR, {
+    required Map<String, int> InitialTime,
+  }) async {
+    _errorMessage = '';
+    final String editSavingURL =
+        'http://salvagefinancial.xyz:5000/api/EditSaving';
+
+    try {
+      final response = await http.post(
+        Uri.parse(editSavingURL),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $_jwtToken',
+        },
+        encoding: Encoding.getByName("utf-8"),
+        body: jsonEncode({
+          'Name': newName,
+          'index': index,
+          'Amount': newAmount,
+          'APR': newAPR,
+          'InitialTime': {
+          'Month': InitialTime['Month'],
+          'Day': InitialTime['Day'],
+          'Year': InitialTime['Year'],
+          }
+        }),
+      );
+      final responseData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        _errorMessage = "Success: ${responseData['Result']}";
+      } else {
+        _errorMessage = "⚠️ Error: ${responseData['Result']}";
+      }
+    } catch (e) {
+      _errorMessage = "Failed to edit saving";
+    }
+  }
+
+  Future<void> EditDebt(
+    String newName,
+    int index,
+    int newAmount,
+    int newAPR, 
+    int newMonthly,
+    int newLoadLength, {
+    required Map<String, int> InitialTime,
+  }) async {
+    _errorMessage = '';
+    final String editDebtURL =
+        'http://salvagefinancial.xyz:5000/api/EditDebt';
+
+    try {
+      final response = await http.post(
+        Uri.parse(editDebtURL),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $_jwtToken',
+        },
+        encoding: Encoding.getByName("utf-8"),
+        body: jsonEncode({
+          'Name': newName,
+          'index': index,
+          'Amount': newAmount,
+          'APR': newAPR,
+          'Monthly': newMonthly,
+          'LoanLength': newLoadLength,
+          'InitialTime': {
+          'Month': InitialTime['Month'],
+          'Day': InitialTime['Day'],
+          'Year': InitialTime['Year'],
+          }
+        }),
+      );
+      final responseData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        _errorMessage = "Success: ${responseData['Result']}";
+      } else {
+        _errorMessage = "⚠️ Error: ${responseData['Result']}";
+      }
+    } catch (e) {
+      _errorMessage = "Failed to edit debt";
     }
   }
 
@@ -334,7 +543,7 @@ class AuthProvider with ChangeNotifier {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization': 'Bearer $_jwtToken'
+          'Authorization': 'Bearer $_jwtToken',
         },
         body: jsonEncode({'index': index}),
       );
@@ -360,7 +569,7 @@ class AuthProvider with ChangeNotifier {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization': 'Bearer $_jwtToken'
+          'Authorization': 'Bearer $_jwtToken',
         },
         body: jsonEncode({'index': index}),
       );
@@ -371,39 +580,89 @@ class AuthProvider with ChangeNotifier {
         _errorMessage = "⚠️ Error: ${responseData['Result']}";
       }
     } catch (e) {
-      _errorMessage = 'Could Not Delete Income';
+      _errorMessage = 'Could Not Delete Expense';
+    }
+  }
+
+  Future<void> DeleteSaving(int index) async {
+    _errorMessage = '';
+    final String deleteSavingURL =
+        'http://salvagefinancial.xyz:5000/api/DeleteSaving';
+
+    try {
+      final response = await http.post(
+        Uri.parse(deleteSavingURL),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $_jwtToken',
+        },
+        body: jsonEncode({'index': index}),
+      );
+      final responseData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        _errorMessage = "Success: ${responseData['Result']}";
+      } else {
+        _errorMessage = "⚠️ Error: ${responseData['Result']}";
+      }
+    } catch (e) {
+      _errorMessage = 'Could Not Delete Saving';
+    }
+  }
+
+  Future<void> DeleteDebt(int index) async {
+    _errorMessage = '';
+    final String deleteDebtURL =
+        'http://salvagefinancial.xyz:5000/api/DeleteDebt';
+
+    try {
+      final response = await http.post(
+        Uri.parse(deleteDebtURL),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $_jwtToken',
+        },
+        body: jsonEncode({'index': index}),
+      );
+      final responseData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        _errorMessage = "Success: ${responseData['Result']}";
+      } else {
+        _errorMessage = "⚠️ Error: ${responseData['Result']}";
+      }
+    } catch (e) {
+      _errorMessage = 'Could Not Delete Debt';
     }
   }
 
   Future<void> ShowAllInfo() async {
     _errorMessage = '';
-    final String ShowAllInfoURL =
+    final String showAllInfoURL =
         'http://salvagefinancial.xyz:5000/api/ShowAllInfo';
 
     try {
       final response = await http.post(
-        Uri.parse('http://YOUR_LOCAL_IP:5000/api/ShowAllInfo'),
+        Uri.parse(showAllInfoURL),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization': 'Bearer $_jwtToken'
+          'Authorization': 'Bearer $_jwtToken',
         },
-        body: jsonEncode({
-        }),
       );
 
       final responseData = json.decode(response.body);
-      print("Fetch User Info Response: ${response.body}"); // Debugging
 
       if (response.statusCode == 200 &&
           responseData['Result'] == "Found user") {
-        return responseData['User']; // Return user object
+        _userData = responseData['User'];
       } else {
-        print("⚠️ Error: ${responseData['Result']}");
-        return null;
+        _errorMessage = responseData['Result'] ?? 'Failed to fetch user data';
       }
     } catch (e) {
-      _errorMessage = 'Could not display all user info';
+      _errorMessage = 'Could not display all user info: ${e.toString()}';
+    } finally {
+      notifyListeners();
     }
   }
 }

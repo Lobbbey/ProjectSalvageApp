@@ -77,7 +77,7 @@ class _AddInitialScreen extends State<AddInitialScreen> {
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(),
-                        labelText: 'InitialAmount',
+                        labelText: 'Initial Amount',
                         hintText: 'Enter Your Initial Amount',
                       ),
                       keyboardType: TextInputType.number,

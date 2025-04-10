@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_1/AuthProvider.dart';
-import 'package:flutter_application_1/routes/Routes.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -61,6 +60,20 @@ class CustomDrawer extends StatelessWidget {
               title: const Text('Expenses'),
               onTap: () {
                 Navigator.pushNamed(context, '/expense');
+              },
+            ),
+            if(authProvider.isLoggedIn)
+            ListTile(
+              title: const Text('Savings'),
+              onTap: () {
+                Navigator.pushNamed(context, '/saving');
+              },
+            ),
+            if(authProvider.isLoggedIn)
+            ListTile(
+              title: const Text('Debts'),
+              onTap: () {
+                Navigator.pushNamed(context, '/debt');
               },
             ),
             if(authProvider.isLoggedIn)

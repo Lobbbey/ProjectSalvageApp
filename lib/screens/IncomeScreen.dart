@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'HomeScreen.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_application_1/AuthProvider.dart';
 
 class IncomeScreen extends StatefulWidget {
   @override
@@ -7,110 +9,274 @@ class IncomeScreen extends StatefulWidget {
 }
 
 class _IncomeScreenState extends State<IncomeScreen> {
+  final TextEditingController _NameController = TextEditingController();
+  final TextEditingController _AmountController = TextEditingController();
+  final TextEditingController _InitialTimeController = TextEditingController();
+  bool _isLoading = false;
+  bool _isRecurring = false;
+  String _alertMessage = '';
+  bool _loadingIncomes = false;
+  int? _editingIndex;
+
   @override
   void initState() {
     super.initState();
+    _loadIncomes();
+  }
+
+  Future<void> _loadIncomes() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    setState(() => _loadingIncomes = true);
+    try {
+      await authProvider.ShowAllInfo();
+    } finally {
+      setState(() => _loadingIncomes = false);
+    }
+  }
+
+  Future<void> _deleteIncome(int index) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    setState(() => _isLoading = true);
+    try {
+      await authProvider.DeleteIncome(index);
+      await _loadIncomes();
+      setState(() {
+        _alertMessage = 'Income deleted successfully';
+        _clearForm();
+      });
+    } catch (e) {
+      setState(() => _alertMessage = 'Failed to delete income');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  void _editIncome(int index) {
+    final incomes = Provider.of<AuthProvider>(context, listen: false).userData?['Income'] ?? [];
+    if (index >= 0 && index < incomes.length) {
+      final income = incomes[index];
+      _NameController.text = income['Name'];
+      _AmountController.text = income['Amount'].toString();
+      _InitialTimeController.text = 
+          '${income['InitialTime']['Month']}/${income['InitialTime']['Day']}/${income['InitialTime']['Year']}';
+      setState(() {
+        _isRecurring = income['IfRecurring'];
+        _editingIndex = index;
+      });
+    }
+  }
+
+  void _clearForm() {
+    _NameController.clear();
+    _AmountController.clear();
+    _InitialTimeController.clear();
+    setState(() {
+      _isRecurring = false;
+      _editingIndex = null;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final incomes = authProvider.userData?['Income'] ?? [];
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Salvage Financials'),
         leading: Builder(
-          builder: (context) {
-            return IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () async {
-                Scaffold.of(context).openDrawer();
-              },
-            );
-          },
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
         ),
       ),
       drawer: CustomDrawer(),
       backgroundColor: Colors.red,
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 2.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    // Search
+        child: Column(
+          children: [
+            // Income Form
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
                     children: [
-                      SizedBox(
-                        width: 200,
-                        child: TextField(
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(),
-                            labelText: 'Search',
-                            hintText: 'Search For a Card',
-                          ),
+                      TextField(
+                        controller: _NameController,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(),
+                          labelText: 'Income Name',
                         ),
                       ),
-                      SizedBox(width: 10),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 10,
+                      SizedBox(height: 10),
+                      TextField(
+                        controller: _AmountController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(),
+                          labelText: 'Amount',
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      TextField(
+                        controller: _InitialTimeController,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(),
+                          labelText: 'Date (MM/DD/YYYY)',
+                        ),
+                        onTap: () async {
+                          final date = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                          );
+                          if (date != null) {
+                            _InitialTimeController.text =
+                                '${date.month}/${date.day}/${date.year}';
+                          }
+                        },
+                      ),
+                      SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Text('Recurring:', style: TextStyle(color: Colors.white)),
+                          Radio(
+                            value: true,
+                            groupValue: _isRecurring,
+                            onChanged: (value) => setState(() => _isRecurring = value!),
+                          ),
+                          Text('Yes', style: TextStyle(color: Colors.white)),
+                          Radio(
+                            value: false,
+                            groupValue: _isRecurring,
+                            onChanged: (value) => setState(() => _isRecurring = value!),
+                          ),
+                          Text('No', style: TextStyle(color: Colors.white)),
+                        ],
+                      ),
+                      if (_alertMessage.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Text(
+                            _alertMessage,
+                            style: TextStyle(color: Colors.white),
                           ),
                         ),
-                        onPressed: () {
+                      ElevatedButton(
+                        onPressed: _isLoading ? null : () async {
+                          if (_NameController.text.isEmpty || 
+                              _AmountController.text.isEmpty || 
+                              _InitialTimeController.text.isEmpty) {
+                            setState(() => _alertMessage = 'Please fill all fields');
+                            return;
+                          }
 
+                          setState(() => _isLoading = true);
+                          try {
+                            final dateParts = _InitialTimeController.text.split('/');
+                            if (dateParts.length != 3) {
+                              setState(() => _alertMessage = 'Invalid date format');
+                              return;
+                            }
+
+                            if (_editingIndex != null) {
+                              await authProvider.EditIncome(
+                                _NameController.text,
+                                _editingIndex!,
+                                int.parse(_AmountController.text),
+                                _isRecurring,
+                                InitialTime: {
+                                  'Month': int.parse(dateParts[0]),
+                                  'Day': int.parse(dateParts[1]),
+                                  'Year': int.parse(dateParts[2]),
+                                },
+                              );
+                            } else {
+                              await authProvider.AddIncome(
+                                _NameController.text,
+                                int.parse(_AmountController.text),
+                                _isRecurring,
+                                InitialTime: {
+                                  'Month': int.parse(dateParts[0]),
+                                  'Day': int.parse(dateParts[1]),
+                                  'Year': int.parse(dateParts[2]),
+                                },
+                              );
+                            }
+                            await _loadIncomes();
+                            setState(() {
+                              _alertMessage = _editingIndex != null 
+                                  ? 'Income updated successfully' 
+                                  : 'Income added successfully';
+                              _clearForm();
+                            });
+                          } catch (e) {
+                            setState(() => _alertMessage = 'Error: ${e.toString()}');
+                          } finally {
+                            setState(() => _isLoading = false);
+                          }
                         },
-                        child: Text(
-                          'Search',
-                          style: TextStyle(fontSize: 16, color: Colors.black),
-                        ),
+                        child: _isLoading
+                            ? CircularProgressIndicator(color: Colors.white)
+                            : Text(_editingIndex != null ? 'Update Income' : 'Add Income'),
                       ),
                     ],
                   ),
-                  SizedBox(height: 10),
-                  // Add
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 10,
-                      ),
-                    ),
-                    onPressed: () {
-                      
-                    },
-                    child: Text(
-                      'Add',
-                      style: TextStyle(fontSize: 16, color: Colors.black),
-                    ),
-                  ),
-
-                  // Go Back
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text(
-                      'Go Back',
-                      style: TextStyle(fontSize: 16, color: Colors.black),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                ],
+                ),
               ),
             ),
-          ),
+            
+            // Income List
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: _loadingIncomes
+                    ? Center(child: CircularProgressIndicator())
+                    : incomes.isEmpty
+                        ? Center(child: Text('No incomes yet'))
+                        : ListView.builder(
+                            itemCount: incomes.length,
+                            itemBuilder: (context, index) {
+                              final income = incomes[index];
+                              return ListTile(
+                                title: Text(income['Name']),
+                                subtitle: Text(
+                                  '\$${income['Amount']} • ${income['InitialTime']['Month']}/${income['InitialTime']['Day']}/${income['InitialTime']['Year']}',
+                                ),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(Icons.edit, color: Colors.blue),
+                                      onPressed: () => _editIncome(index),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.delete, color: Colors.red),
+                                      onPressed: () => _deleteIncome(index),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+              ),
+            ),
+          ],
         ),
       ),
     );

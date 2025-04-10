@@ -114,9 +114,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         setState(() => _isLoading = false);
 
-                        if (authProvider.isLoggedIn) {
+                        if (authProvider.isLoggedIn) { // If they have it then dont go
                               Navigator.pushNamed(context, '/initial');
                             }
+                        else{
+                          Navigator.pushNamed(context, '/analytics');
+                        }
                     },
                     child: Text(
                       'Login',
