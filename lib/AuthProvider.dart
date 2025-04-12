@@ -38,7 +38,6 @@ class AuthProvider with ChangeNotifier {
         if (responseData['Result'] == 'Found user' &&
             responseData['token'] != null) {
           _jwtToken = responseData['token'];
-          print(_jwtToken);
           _isLoggedIn = true;
           _errorMessage = '';
         } else {
@@ -136,7 +135,6 @@ class AuthProvider with ChangeNotifier {
   Future<void> AddInitial(int InitialDebt, int InitialAmount) async {
     _errorMessage = '';
     _addedInitial = false;
-    print(jwtToken);
     try {
       const String addInitURL =
           'http://salvagefinancial.xyz:5000/api/AddInitial';
@@ -144,6 +142,7 @@ class AuthProvider with ChangeNotifier {
         Uri.parse(addInitURL),
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
           'Authorization': 'Bearer $_jwtToken',
         },
         body: json.encode({
@@ -163,7 +162,7 @@ class AuthProvider with ChangeNotifier {
             (responseData['error'] ?? 'Error adding info');
       }
     } catch (e) {
-      _errorMessage = 'Could Not add amount and debt';
+      _errorMessage = 'Could Not add initial amount and debt';
       return;
     } finally {
       notifyListeners();

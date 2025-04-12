@@ -30,7 +30,7 @@ class _AddInitialScreen extends State<AddInitialScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Salvage Financials'),
+        title: const Text('Add Initial'),
         leading: Builder(
           builder: (context) {
             return IconButton(

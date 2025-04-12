@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'HomeScreen.dart';
+import 'package:flutter_application_1/widgets/navbar.dart';
 
 class AnalyticsScreen extends StatefulWidget {
   @override

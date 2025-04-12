@@ -9,6 +9,8 @@ import 'package:flutter_application_1/screens/AddInitialScreen.dart';
 import 'package:flutter_application_1/screens/DebtScreen.dart';
 import 'package:flutter_application_1/screens/SavingScreen.dart';
 
+
+
 class Routes {
   static const String LOGINSCREEN = '/login';
   static const String INCOMESCREEN = '/income';
@@ -23,7 +25,6 @@ class Routes {
 
   // routes of pages in the app
   static Map<String, Widget Function(BuildContext)> get getroutes => {
-    '/': (context) => HomeScreen(),
     HOMESCREEN: (context) => HomeScreen(),
     LOGINSCREEN: (context) => LoginScreen(),
     ADDINITIALSCREEN: (context) => AddInitialScreen(),
