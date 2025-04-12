@@ -49,8 +49,6 @@ class _LoginScreenState extends State<LoginScreen> {
           },
         ),
       ),
-      drawer: CustomDrawer(),
-      backgroundColor: Colors.grey,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(

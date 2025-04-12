@@ -98,7 +98,6 @@ class _SavingScreenState extends State<SavingScreen> {
         ),
       ),
       drawer: CustomDrawer(),
-      backgroundColor: Colors.red,
       body: SafeArea(
         child: Column(
           children: [

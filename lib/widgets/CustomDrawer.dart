@@ -1,42 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_1/AuthProvider.dart';
-import 'package:flutter_application_1/theme/ThemeProvider.dart';
-
-class HomeScreen extends StatefulWidget {
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Salvage Financial')),
-      drawer: CustomDrawer(),
-      body: const Center(child: Text("Welcome to Salvage Financial!")),
-    );
-  }
-}
 
 class CustomDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    bool isDarkMode = themeProvider.isDarkMode;
     return Drawer(
       child: ListView(
         children: [
           const DrawerHeader(
             decoration: BoxDecoration(color: Colors.blue),
             child: Text('Dashboard'),
-          ),
-          SwitchListTile(
-            title: const Text("Dark Mode"),
-            value: isDarkMode,
-            onChanged: (val) => themeProvider.toggleTheme(val),
-            secondary: Icon(isDarkMode ? Icons.dark_mode : Icons.light_mode),
           ),
           ListTile(
             title: const Text('Home'),

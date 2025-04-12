@@ -37,7 +37,6 @@ class SignUpScreen extends StatelessWidget {
           },
         ),
       ),
-      drawer: CustomDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

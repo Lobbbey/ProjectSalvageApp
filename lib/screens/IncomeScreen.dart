@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'HomeScreen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_1/AuthProvider.dart';
+import 'package:flutter_application_1/widgets/navbar.dart';
 
 class IncomeScreen extends StatefulWidget {
   @override

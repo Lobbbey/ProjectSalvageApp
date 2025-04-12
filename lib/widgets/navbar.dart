@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/IncomeScreen.dart';
 import 'package:flutter_application_1/screens/AnalyticsScreen.dart';
-import 'package:flutter_application_1/screens/DebtScreen.dart';
-import 'package:flutter_application_1/screens/HomeScreen.dart';
+import 'package:flutter_application_1/screens/ExpenseScreen.dart';
 import 'package:flutter_application_1/screens/LoginScreen.dart';
 import 'package:flutter_application_1/screens/SignUpScreen.dart';
 import 'package:flutter_application_1/AuthProvider.dart';
@@ -19,9 +18,8 @@ class _PersistentNavScaffoldState extends State<PersistentNavScaffold> {
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
-    HomeScreen(),
     IncomeScreen(),
-    DebtScreen(),
+    ExpenseScreen(),
     AnalyticsScreen(),
   ];
 
@@ -38,15 +36,13 @@ class _PersistentNavScaffoldState extends State<PersistentNavScaffold> {
         final isLoggedIn = authProvider.isLoggedIn;
 
         return Scaffold(
-          appBar: AppBar(title: const Text('Salvage Financial')),
           body: IndexedStack(
             index: _selectedIndex,
             children:
                 isLoggedIn
                     ? [
-                      HomeScreen(),
                       IncomeScreen(),
-                      DebtScreen(),
+                      ExpenseScreen(),
                       AnalyticsScreen(),
                     ]
                     : [LoginScreen(), SignUpScreen()],
@@ -70,7 +66,7 @@ class _PersistentNavScaffoldState extends State<PersistentNavScaffold> {
                       ),
                       BottomNavigationBarItem(
                         icon: Icon(Icons.money_off),
-                        label: "Debt",
+                        label: "Exspense",
                       ),
                       BottomNavigationBarItem(
                         icon: Icon(Icons.analytics),
