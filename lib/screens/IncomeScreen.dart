@@ -52,12 +52,14 @@ class _IncomeScreenState extends State<IncomeScreen> {
   }
 
   void _editIncome(int index) {
-    final incomes = Provider.of<AuthProvider>(context, listen: false).userData?['Income'] ?? [];
+    final incomes =
+        Provider.of<AuthProvider>(context, listen: false).userData?['Income'] ??
+        [];
     if (index >= 0 && index < incomes.length) {
       final income = incomes[index];
       _NameController.text = income['Name'];
       _AmountController.text = income['Amount'].toString();
-      _InitialTimeController.text = 
+      _InitialTimeController.text =
           '${income['InitialTime']['Month']}/${income['InitialTime']['Day']}/${income['InitialTime']['Year']}';
       setState(() {
         _isRecurring = income['IfRecurring'];
@@ -82,19 +84,18 @@ class _IncomeScreenState extends State<IncomeScreen> {
     final incomeMap = authProvider.userData?['Income'] ?? {};
     final incomes = incomeMap is Map ? incomeMap.values.toList() : [];
 
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Salvage Financials'),
         leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
+          builder:
+              (context) => IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () => Scaffold.of(context).openDrawer(),
+              ),
         ),
       ),
       drawer: CustomDrawer(),
-      backgroundColor: Colors.red,
       body: SafeArea(
         child: Column(
           children: [
@@ -108,8 +109,6 @@ class _IncomeScreenState extends State<IncomeScreen> {
                       TextField(
                         controller: _NameController,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
                           border: OutlineInputBorder(),
                           labelText: 'Income Name',
                         ),
@@ -119,8 +118,6 @@ class _IncomeScreenState extends State<IncomeScreen> {
                         controller: _AmountController,
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
                           border: OutlineInputBorder(),
                           labelText: 'Amount',
                         ),
@@ -129,8 +126,6 @@ class _IncomeScreenState extends State<IncomeScreen> {
                       TextField(
                         controller: _InitialTimeController,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
                           border: OutlineInputBorder(),
                           labelText: 'Date (MM/DD/YYYY)',
                         ),
@@ -150,19 +145,25 @@ class _IncomeScreenState extends State<IncomeScreen> {
                       SizedBox(height: 10),
                       Row(
                         children: [
-                          Text('Recurring:', style: TextStyle(color: Colors.white)),
+                          Text(
+                            'Recurring:',
+                          ),
                           Radio(
                             value: true,
                             groupValue: _isRecurring,
-                            onChanged: (value) => setState(() => _isRecurring = value!),
+                            onChanged:
+                                (value) =>
+                                    setState(() => _isRecurring = value!),
                           ),
-                          Text('Yes', style: TextStyle(color: Colors.white)),
+                          Text('Yes',),
                           Radio(
                             value: false,
                             groupValue: _isRecurring,
-                            onChanged: (value) => setState(() => _isRecurring = value!),
+                            onChanged:
+                                (value) =>
+                                    setState(() => _isRecurring = value!),
                           ),
-                          Text('No', style: TextStyle(color: Colors.white)),
+                          Text('No',),
                         ],
                       ),
                       if (_alertMessage.isNotEmpty)
@@ -170,73 +171,95 @@ class _IncomeScreenState extends State<IncomeScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Text(
                             _alertMessage,
-                            style: TextStyle(color: Colors.white),
                           ),
                         ),
                       ElevatedButton(
-                        onPressed: _isLoading ? null : () async {
-                          if (_NameController.text.isEmpty || 
-                              _AmountController.text.isEmpty || 
-                              _InitialTimeController.text.isEmpty) {
-                            setState(() => _alertMessage = 'Please fill all fields');
-                            return;
-                          }
+                        onPressed:
+                            _isLoading
+                                ? null
+                                : () async {
+                                  if (_NameController.text.isEmpty ||
+                                      _AmountController.text.isEmpty ||
+                                      _InitialTimeController.text.isEmpty) {
+                                    setState(
+                                      () =>
+                                          _alertMessage =
+                                              'Please fill all fields',
+                                    );
+                                    return;
+                                  }
 
-                          setState(() => _isLoading = true);
-                          try {
-                            final dateParts = _InitialTimeController.text.split('/');
-                            if (dateParts.length != 3) {
-                              setState(() => _alertMessage = 'Invalid date format');
-                              return;
-                            }
+                                  setState(() => _isLoading = true);
+                                  try {
+                                    final dateParts = _InitialTimeController
+                                        .text
+                                        .split('/');
+                                    if (dateParts.length != 3) {
+                                      setState(
+                                        () =>
+                                            _alertMessage =
+                                                'Invalid date format',
+                                      );
+                                      return;
+                                    }
 
-                            if (_editingIndex != null) {
-                              await authProvider.EditIncome(
-                                _NameController.text,
-                                _editingIndex!,
-                                int.parse(_AmountController.text),
-                                _isRecurring,
-                                InitialTime: {
-                                  'Month': int.parse(dateParts[0]),
-                                  'Day': int.parse(dateParts[1]),
-                                  'Year': int.parse(dateParts[2]),
+                                    if (_editingIndex != null) {
+                                      await authProvider.EditIncome(
+                                        _NameController.text,
+                                        _editingIndex!,
+                                        int.parse(_AmountController.text),
+                                        _isRecurring,
+                                        InitialTime: {
+                                          'Month': int.parse(dateParts[0]),
+                                          'Day': int.parse(dateParts[1]),
+                                          'Year': int.parse(dateParts[2]),
+                                        },
+                                      );
+                                    } else {
+                                      await authProvider.AddIncome(
+                                        _NameController.text,
+                                        int.parse(_AmountController.text),
+                                        _isRecurring,
+                                        InitialTime: {
+                                          'Month': int.parse(dateParts[0]),
+                                          'Day': int.parse(dateParts[1]),
+                                          'Year': int.parse(dateParts[2]),
+                                        },
+                                      );
+                                    }
+                                    await _loadIncomes();
+                                    setState(() {
+                                      _alertMessage =
+                                          _editingIndex != null
+                                              ? 'Income updated successfully'
+                                              : 'Income added successfully';
+                                      _clearForm();
+                                    });
+                                  } catch (e) {
+                                    setState(
+                                      () =>
+                                          _alertMessage =
+                                              'Error: ${e.toString()}',
+                                    );
+                                  } finally {
+                                    setState(() => _isLoading = false);
+                                  }
                                 },
-                              );
-                            } else {
-                              await authProvider.AddIncome(
-                                _NameController.text,
-                                int.parse(_AmountController.text),
-                                _isRecurring,
-                                InitialTime: {
-                                  'Month': int.parse(dateParts[0]),
-                                  'Day': int.parse(dateParts[1]),
-                                  'Year': int.parse(dateParts[2]),
-                                },
-                              );
-                            }
-                            await _loadIncomes();
-                            setState(() {
-                              _alertMessage = _editingIndex != null 
-                                  ? 'Income updated successfully' 
-                                  : 'Income added successfully';
-                              _clearForm();
-                            });
-                          } catch (e) {
-                            setState(() => _alertMessage = 'Error: ${e.toString()}');
-                          } finally {
-                            setState(() => _isLoading = false);
-                          }
-                        },
-                        child: _isLoading
-                            ? CircularProgressIndicator(color: Colors.white)
-                            : Text(_editingIndex != null ? 'Update Income' : 'Add Income'),
+                        child:
+                            _isLoading
+                                ? CircularProgressIndicator(color: Colors.white)
+                                : Text(
+                                  _editingIndex != null
+                                      ? 'Update Income'
+                                      : 'Add Income',
+                                ),
                       ),
                     ],
                   ),
                 ),
               ),
             ),
-            
+
             // Income List
             Expanded(
               child: Container(
@@ -247,35 +270,36 @@ class _IncomeScreenState extends State<IncomeScreen> {
                     topRight: Radius.circular(20),
                   ),
                 ),
-                child: _loadingIncomes
-                    ? Center(child: CircularProgressIndicator())
-                    : incomes.isEmpty
+                child:
+                    _loadingIncomes
+                        ? Center(child: CircularProgressIndicator())
+                        : incomes.isEmpty
                         ? Center(child: Text('No incomes yet'))
                         : ListView.builder(
-                            itemCount: incomes.length,
-                            itemBuilder: (context, index) {
-                              final income = incomes[index];
-                              return ListTile(
-                                title: Text(income['Name']),
-                                subtitle: Text(
-                                  '\$${income['Amount']} • ${income['InitialTime']['Month']}/${income['InitialTime']['Day']}/${income['InitialTime']['Year']}',
-                                ),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(Icons.edit, color: Colors.blue),
-                                      onPressed: () => _editIncome(index),
-                                    ),
-                                    IconButton(
-                                      icon: Icon(Icons.delete, color: Colors.red),
-                                      onPressed: () => _deleteIncome(index),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
+                          itemCount: incomes.length,
+                          itemBuilder: (context, index) {
+                            final income = incomes[index];
+                            return ListTile(
+                              title: Text(income['Name']),
+                              subtitle: Text(
+                                '\$${income['Amount']} • ${income['InitialTime']['Month']}/${income['InitialTime']['Day']}/${income['InitialTime']['Year']}',
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.edit, color: Colors.blue),
+                                    onPressed: () => _editIncome(index),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () => _deleteIncome(index),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
               ),
             ),
           ],

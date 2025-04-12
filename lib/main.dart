@@ -17,7 +17,6 @@ void main() {
   );
 }
 
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -35,7 +34,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
 final ThemeData lightTheme = ThemeData(
   brightness: Brightness.light,
   fontFamily: 'Inter',
@@ -43,16 +41,23 @@ final ThemeData lightTheme = ThemeData(
   primaryColor: Color(0xFF646CFF),
   textTheme: const TextTheme(
     bodyMedium: TextStyle(
-      color: Color(0xFF213547),
+      color: Color(0xFF1A1A1A),
       fontWeight: FontWeight.w400,
       height: 1.5,
     ),
+    bodyLarge: TextStyle(color: Color(0xFF1A1A1A)),
+    bodySmall: TextStyle(color: Color(0xFF1A1A1A)),
+    labelLarge: TextStyle(color: Color(0xFF1A1A1A)),
+    titleMedium: TextStyle(color: Color(0xFF1A1A1A)),
     headlineLarge: TextStyle(
       fontSize: 51.2,
       height: 1.1,
       fontWeight: FontWeight.w400,
+      color: Color(0xFF1A1A1A),
     ),
+    headlineSmall: TextStyle(fontSize: 24, color: Color(0xFF1A1A1A)),
   ),
+
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: Color(0xFFF9F9F9),
@@ -74,16 +79,23 @@ final ThemeData darkTheme = ThemeData(
   primaryColor: Color(0xFF646CFF),
   textTheme: const TextTheme(
     bodyMedium: TextStyle(
-      color: Color(0xDEFFFFFF),
+      color: Color(0xFFFFFFFF),
       fontWeight: FontWeight.w400,
       height: 1.5,
     ),
+    bodyLarge: TextStyle(color: Color(0xFFFFFFFF)),
+    bodySmall: TextStyle(color: Color(0xFFCCCCCC)),
+    labelLarge: TextStyle(color: Color(0xFFDDDDDD)),
+    titleMedium: TextStyle(color: Color(0xFFFFFFFF)),
     headlineLarge: TextStyle(
       fontSize: 51.2,
       height: 1.1,
       fontWeight: FontWeight.w400,
+      color: Color(0xFFFFFFFF),
     ),
+    headlineSmall: TextStyle(fontSize: 24, color: Color(0xFFFFFFFF)),
   ),
+
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: Color(0xFF1A1A1A),

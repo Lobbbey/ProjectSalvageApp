@@ -33,7 +33,7 @@ class CustomDrawer extends StatelessWidget {
             child: Text('Dashboard'),
           ),
           SwitchListTile(
-            title: const Text("Dark Mode"),
+            title: isDarkMode ? const Text("Dark Mode") : const Text("Light Mode"),
             value: isDarkMode,
             onChanged: (val) => themeProvider.toggleTheme(val),
             secondary: Icon(isDarkMode ? Icons.dark_mode : Icons.light_mode),
@@ -41,7 +41,8 @@ class CustomDrawer extends StatelessWidget {
           ListTile(
             title: const Text('Home'),
             onTap: () {
-              Navigator.pushNamed(context, '/home');
+              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/home');
             },
           ),
           if (!authProvider.isLoggedIn)
@@ -62,7 +63,8 @@ class CustomDrawer extends StatelessWidget {
             ListTile(
               title: const Text('Income'),
               onTap: () {
-                Navigator.pushNamed(context, '/income');
+                Navigator.pop(context); // close the drawer
+                Navigator.pushReplacementNamed(context, '/income'); // or your target screen
               },
             ),
           if (authProvider.isLoggedIn)

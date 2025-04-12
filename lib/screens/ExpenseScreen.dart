@@ -96,7 +96,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Salvage Financials'),
+        title: const Text('Salvage Financial'),
         leading: Builder(
           builder:
               (context) => IconButton(
@@ -106,7 +106,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
         ),
       ),
       drawer: CustomDrawer(),
-      backgroundColor: Colors.red,
       body: SafeArea(
         child: Column(
           children: [
@@ -120,8 +119,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                       TextField(
                         controller: _NameController,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
                           border: OutlineInputBorder(),
                           labelText: 'Expense Name',
                         ),
@@ -131,8 +128,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                         controller: _AmountController,
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
                           border: OutlineInputBorder(),
                           labelText: 'Amount',
                         ),
@@ -142,8 +137,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                         controller: _CategoryController,
                         keyboardType: TextInputType.text,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
                           border: OutlineInputBorder(),
                           labelText: 'Category',
                         ),
@@ -152,8 +145,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                       TextField(
                         controller: _InitialTimeController,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
                           border: OutlineInputBorder(),
                           labelText: 'Date (MM/DD/YYYY)',
                         ),
@@ -175,7 +166,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                         children: [
                           Text(
                             'Recurring:',
-                            style: TextStyle(color: Colors.white),
                           ),
                           Radio(
                             value: true,
@@ -184,7 +174,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                 (value) =>
                                     setState(() => _isRecurring = value!),
                           ),
-                          Text('Yes', style: TextStyle(color: Colors.white)),
+                          Text('Yes',),
                           Radio(
                             value: false,
                             groupValue: _isRecurring,
@@ -192,7 +182,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                 (value) =>
                                     setState(() => _isRecurring = value!),
                           ),
-                          Text('No', style: TextStyle(color: Colors.white)),
+                          Text('No',),
                         ],
                       ),
                       if (_alertMessage.isNotEmpty)
@@ -200,7 +190,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Text(
                             _alertMessage,
-                            style: TextStyle(color: Colors.white),
                           ),
                         ),
                       ElevatedButton(
@@ -312,31 +301,31 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                           itemCount: expenses.length,
                           itemBuilder: (context, index) {
                             final expense = expenses[index];
-                          final initialTime = expense['InitialTime'];
-final dateString = (initialTime != null)
-    ? '${initialTime['Month']}/${initialTime['Day']}/${initialTime['Year']}'
-    : 'No date';
+                            final initialTime = expense['InitialTime'];
+                            final dateString =
+                                (initialTime != null)
+                                    ? '${initialTime['Month']}/${initialTime['Day']}/${initialTime['Year']}'
+                                    : 'No date';
 
-return ListTile(
-  title: Text(expense['Name']),
-  subtitle: Text(
-    '${expense['Category']} • \$${expense['Amount']} • $dateString',
-  ),
-  trailing: Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      IconButton(
-        icon: Icon(Icons.edit, color: Colors.blue),
-        onPressed: () => _editExpense(index),
-      ),
-      IconButton(
-        icon: Icon(Icons.delete, color: Colors.red),
-        onPressed: () => _deleteExpense(index),
-      ),
-    ],
-  ),
-);
-
+                            return ListTile(
+                              title: Text(expense['Name']),
+                              subtitle: Text(
+                                '${expense['Category']} • \$${expense['Amount']} • $dateString',
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.edit, color: Colors.blue),
+                                    onPressed: () => _editExpense(index),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () => _deleteExpense(index),
+                                  ),
+                                ],
+                              ),
+                            );
                           },
                         ),
               ),
