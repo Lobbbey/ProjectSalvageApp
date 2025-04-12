@@ -32,7 +32,6 @@ class AuthProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-      //final String storeToken = responseData['token'];
 
       if (response.statusCode == 200) {
         if (responseData['Result'] == 'Found user' &&
@@ -40,23 +39,31 @@ class AuthProvider with ChangeNotifier {
           _jwtToken = responseData['token'];
           _isLoggedIn = true;
           _errorMessage = '';
+          notifyListeners();
+          return;
         } else {
+          _isLoggedIn = false;
           _errorMessage =
               responseData['message'] ??
-              (responseData['error'] ?? 'User/Password Invaild');
+              (responseData['error'] ?? 'User/Password Invalid');
+          notifyListeners();
           return;
         }
       } else {
+        _isLoggedIn = false;
         _errorMessage =
             responseData['message'] ??
             'Server responded with ${response.statusCode}';
+        notifyListeners();
         return;
       }
     } on FormatException {
+      _isLoggedIn = false;
       _errorMessage = 'Invalid server response format';
+      notifyListeners();
     } catch (e) {
+      _isLoggedIn = false;
       _errorMessage = 'Login failed: ${e.toString()}';
-    } finally {
       notifyListeners();
     }
   }
@@ -243,10 +250,10 @@ class AuthProvider with ChangeNotifier {
           'Category': Category,
           'IfRecurring': IfRecurring,
           'InitialTime': {
-          'Month': InitialTime['Month'],
-          'Day': InitialTime['Day'],
-          'Year': InitialTime['Year'],
-        },
+            'Month': InitialTime['Month'],
+            'Day': InitialTime['Day'],
+            'Year': InitialTime['Year'],
+          },
         }),
       );
       final responseData = json.decode(response.body);
@@ -286,10 +293,10 @@ class AuthProvider with ChangeNotifier {
           'Amount': Amount,
           'APR': APR,
           'InitialTime': {
-          'Month': InitialTime['Month'],
-          'Day': InitialTime['Day'],
-          'Year': InitialTime['Year'],
-        },
+            'Month': InitialTime['Month'],
+            'Day': InitialTime['Day'],
+            'Year': InitialTime['Year'],
+          },
         }),
       );
       final responseData = json.decode(response.body);
@@ -315,8 +322,7 @@ class AuthProvider with ChangeNotifier {
     required Map<String, int> InitialTime,
   }) async {
     _errorMessage = '';
-    final String addSavingURL =
-        'http://salvagefinancial.xyz:5000/api/AddDebt';
+    final String addSavingURL = 'http://salvagefinancial.xyz:5000/api/AddDebt';
     try {
       final response = await http.post(
         Uri.parse(addSavingURL),
@@ -333,10 +339,10 @@ class AuthProvider with ChangeNotifier {
           'Monthly': Monthly,
           'LoanLength': LoanLength,
           'InitialTime': {
-          'Month': InitialTime['Month'],
-          'Day': InitialTime['Day'],
-          'Year': InitialTime['Year'],
-        },
+            'Month': InitialTime['Month'],
+            'Day': InitialTime['Day'],
+            'Year': InitialTime['Year'],
+          },
         }),
       );
       final responseData = json.decode(response.body);
@@ -379,10 +385,10 @@ class AuthProvider with ChangeNotifier {
           'Amount': newAmount,
           'IfReccuring': newIfRecurring,
           'InitialTime': {
-          'Month': InitialTime['Month'],
-          'Day': InitialTime['Day'],
-          'Year': InitialTime['Year'],
-          }
+            'Month': InitialTime['Month'],
+            'Day': InitialTime['Day'],
+            'Year': InitialTime['Year'],
+          },
         }),
       );
       final responseData = json.decode(response.body);
@@ -424,10 +430,10 @@ class AuthProvider with ChangeNotifier {
           'Category': newCategory,
           'IfReccuring': newIfRecurring,
           'InitialTime': {
-          'Month': InitialTime['Month'],
-          'Day': InitialTime['Day'],
-          'Year': InitialTime['Year'],
-          }
+            'Month': InitialTime['Month'],
+            'Day': InitialTime['Day'],
+            'Year': InitialTime['Year'],
+          },
         }),
       );
       final responseData = json.decode(response.body);
@@ -467,10 +473,10 @@ class AuthProvider with ChangeNotifier {
           'Amount': newAmount,
           'APR': newAPR,
           'InitialTime': {
-          'Month': InitialTime['Month'],
-          'Day': InitialTime['Day'],
-          'Year': InitialTime['Year'],
-          }
+            'Month': InitialTime['Month'],
+            'Day': InitialTime['Day'],
+            'Year': InitialTime['Year'],
+          },
         }),
       );
       final responseData = json.decode(response.body);
@@ -488,14 +494,13 @@ class AuthProvider with ChangeNotifier {
     String newName,
     int index,
     int newAmount,
-    int newAPR, 
+    int newAPR,
     int newMonthly,
     int newLoadLength, {
     required Map<String, int> InitialTime,
   }) async {
     _errorMessage = '';
-    final String editDebtURL =
-        'http://salvagefinancial.xyz:5000/api/EditDebt';
+    final String editDebtURL = 'http://salvagefinancial.xyz:5000/api/EditDebt';
 
     try {
       final response = await http.post(
@@ -514,10 +519,10 @@ class AuthProvider with ChangeNotifier {
           'Monthly': newMonthly,
           'LoanLength': newLoadLength,
           'InitialTime': {
-          'Month': InitialTime['Month'],
-          'Day': InitialTime['Day'],
-          'Year': InitialTime['Year'],
-          }
+            'Month': InitialTime['Month'],
+            'Day': InitialTime['Day'],
+            'Year': InitialTime['Year'],
+          },
         }),
       );
       final responseData = json.decode(response.body);

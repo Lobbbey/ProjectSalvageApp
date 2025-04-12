@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/AuthProvider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_1/screens/HomeScreen.dart';
+import 'package:flutter_application_1/widgets/navbar.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -14,7 +15,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
 
   @override
-  void dispose(){
+  void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -37,7 +38,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Salvage Financials'),
         leading: Builder(
           builder: (context) {
             return IconButton(
@@ -96,36 +96,37 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(height: 10),
                   _isLoading
-                    ? CircularProgressIndicator()
-                    : ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 10,
+                      ? CircularProgressIndicator()
+                      : ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 10,
+                          ),
+                        ),
+                        onPressed: () async {
+                          setState(() => _isLoading = true);
+                          await authProvider.login(
+                            _emailController.text.trim(),
+                            _passwordController.text.trim(),
+                          );
+
+                          setState(() => _isLoading = false);
+                          if (authProvider.isLoggedIn) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const PersistentNavScaffold(),
+                              ),
+                            );
+                          }
+                        },
+                        child: Text(
+                          'Login',
+                          style: TextStyle(fontSize: 16, color: Colors.black),
+                        ),
                       ),
-                    ),
-                    onPressed: () async {
-                      setState(() => _isLoading = true);
-                        await authProvider.login(
-                          _emailController.text.trim(),
-                          _passwordController.text.trim(),
-                        );
-
-                        setState(() => _isLoading = false);
-
-                        if (authProvider.isLoggedIn) { // If they have it then dont go
-                              Navigator.pushNamed(context, '/initial');
-                            }
-                        else{
-                          Navigator.pushNamed(context, '/analytics');
-                        }
-                    },
-                    child: Text(
-                      'Login',
-                      style: TextStyle(fontSize: 16, color: Colors.black),
-                    ),
-                  ),
                   TextButton(
                     onPressed: () async {
                       Navigator.pushNamed(context, '/signup');

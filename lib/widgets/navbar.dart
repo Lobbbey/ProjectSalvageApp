@@ -65,10 +65,6 @@ class _PersistentNavScaffoldState extends State<PersistentNavScaffold> {
                 isLoggedIn
                     ? const [
                       BottomNavigationBarItem(
-                        icon: Icon(Icons.home),
-                        label: "Home",
-                      ),
-                      BottomNavigationBarItem(
                         icon: Icon(Icons.attach_money),
                         label: "Income",
                       ),
