@@ -64,8 +64,13 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
       _NameController.text = expense['Name'];
       _AmountController.text = expense['Amount'].toString();
       _CategoryController.text = expense['Category'];
-      _InitialTimeController.text =
-          '${expense['InitialTime']['Month']}/${expense['InitialTime']['Day']}/${expense['InitialTime']['Year']}';
+      if (expense['InitialTime'] != null) {
+        _InitialTimeController.text =
+            '${expense['InitialTime']['Month']}/${expense['InitialTime']['Day']}/${expense['InitialTime']['Year']}';
+      } else {
+        _InitialTimeController.clear();
+      }
+
       setState(() {
         _isRecurring = expense['IfRecurring'];
         _editingIndex = index;
@@ -307,25 +312,31 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                           itemCount: expenses.length,
                           itemBuilder: (context, index) {
                             final expense = expenses[index];
-                            return ListTile(
-                              title: Text(expense['Name']),
-                              subtitle: Text(
-                                '${expense['Category']} • \$${expense['Amount']} • ${expense['InitialTime']['Month']}/${expense['InitialTime']['Day']}/${expense['InitialTime']['Year']}',
-                              ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(Icons.edit, color: Colors.blue),
-                                    onPressed: () => _editExpense(index),
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.delete, color: Colors.red),
-                                    onPressed: () => _deleteExpense(index),
-                                  ),
-                                ],
-                              ),
-                            );
+                          final initialTime = expense['InitialTime'];
+final dateString = (initialTime != null)
+    ? '${initialTime['Month']}/${initialTime['Day']}/${initialTime['Year']}'
+    : 'No date';
+
+return ListTile(
+  title: Text(expense['Name']),
+  subtitle: Text(
+    '${expense['Category']} • \$${expense['Amount']} • $dateString',
+  ),
+  trailing: Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      IconButton(
+        icon: Icon(Icons.edit, color: Colors.blue),
+        onPressed: () => _editExpense(index),
+      ),
+      IconButton(
+        icon: Icon(Icons.delete, color: Colors.red),
+        onPressed: () => _deleteExpense(index),
+      ),
+    ],
+  ),
+);
+
                           },
                         ),
               ),

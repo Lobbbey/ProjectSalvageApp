@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'HomeScreen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_1/AuthProvider.dart';
-import 'package:flutter_application_1/widgets/navbar.dart';
 
 class IncomeScreen extends StatefulWidget {
   @override
@@ -80,7 +79,9 @@ class _IncomeScreenState extends State<IncomeScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
-    final incomes = authProvider.userData?['Income'] ?? [];
+    final incomeMap = authProvider.userData?['Income'] ?? {};
+    final incomes = incomeMap is Map ? incomeMap.values.toList() : [];
+
 
     return Scaffold(
       appBar: AppBar(
