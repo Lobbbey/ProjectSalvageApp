@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:flutter_application_1/AuthProvider.dart';
 
 class IncomeScreen extends StatefulWidget {
+  const IncomeScreen({super.key});
+
   @override
   _IncomeScreenState createState() => _IncomeScreenState();
 }
@@ -81,12 +83,11 @@ class _IncomeScreenState extends State<IncomeScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
-    final incomeMap = authProvider.userData?['Income'] ?? {};
-    final incomes = incomeMap is Map ? incomeMap.values.toList() : [];
-
+    final incomes = authProvider.userData?['Income'] ?? [];
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Salvage Financials'),
+        title: const Text('Salvage Financial'),
         leading: Builder(
           builder:
               (context) => IconButton(
@@ -275,15 +276,15 @@ class _IncomeScreenState extends State<IncomeScreen> {
                           itemBuilder: (context, index) {
                             final income = incomes[index];
                             final initialTime = income['InitialTime'];
-                            final dateString =
-                                (initialTime != null)
-                                    ? '${initialTime['Month']}/${initialTime['Day']}/${initialTime['Year']}'
-                                    : 'No date';
+                            //final dateString =
+                              //  (initialTime != null)
+                                //    ? '${initialTime['Month']}/${initialTime['Day']}/${initialTime['Year']}'
+                                  //  : 'No date';
 
                             return ListTile(
                               title: Text(income['Name']),
                               subtitle: Text(
-                                '${income['Category']} • \$${income['Amount']} • $dateString',
+                                '\$${income['Amount']} ',
                               ),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
