@@ -84,7 +84,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     final incomes = authProvider.userData?['Income'] ?? [];
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Salvage Financial'),
@@ -276,16 +276,14 @@ class _IncomeScreenState extends State<IncomeScreen> {
                           itemBuilder: (context, index) {
                             final income = incomes[index];
                             final initialTime = income['InitialTime'];
-                            //final dateString =
-                              //  (initialTime != null)
-                                //    ? '${initialTime['Month']}/${initialTime['Day']}/${initialTime['Year']}'
-                                  //  : 'No date';
+                            final dateString =
+                                (initialTime != null)
+                                    ? '${initialTime['Month']}/${initialTime['Day']}/${initialTime['Year']}'
+                                    : 'No date';
 
                             return ListTile(
                               title: Text(income['Name']),
-                              subtitle: Text(
-                                '\$${income['Amount']} ',
-                              ),
+                              subtitle: Text('\$${income['Amount']} • $dateString'),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
