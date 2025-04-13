@@ -4,6 +4,8 @@ import 'package:flutter_application_1/AuthProvider.dart';
 import 'package:flutter_application_1/theme/ThemeProvider.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -100,7 +102,7 @@ class CustomDrawer extends StatelessWidget {
               title: const Text('Logout'),
               onTap: () async {
                 authProvider.logout();
-                Navigator.pushNamed(context, '/home');
+                Navigator.pushNamed(context, '/login');
               },
             ),
         ],
