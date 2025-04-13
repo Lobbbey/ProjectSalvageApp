@@ -640,6 +640,12 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  List<dynamic> _allExpenses = [];
+  List<dynamic> _allIncome = [];
+
+  List<dynamic> get allExpenses => _allExpenses;
+  List<dynamic> get allIncome => _allIncome;
+
   Future<void> ShowAllInfo() async {
     _errorMessage = '';
     final String showAllInfoURL =
@@ -660,6 +666,8 @@ class AuthProvider with ChangeNotifier {
       if (response.statusCode == 200 &&
           responseData['Result'] == "Found user") {
         _userData = responseData['User'];
+        _allExpenses = responseData['Expenses'] ?? [];
+        _allIncome = responseData['Incomes'] ?? []; // if also returned
       } else {
         _errorMessage = responseData['Result'] ?? 'Failed to fetch user data';
       }
