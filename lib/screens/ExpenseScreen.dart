@@ -20,6 +20,8 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   String _alertMessage = '';
   bool _loadingExpenses = false;
   int? _editingIndex;
+  String? _selectedAccount;
+  List<String> _accountOptions = ['Untracked'];
 
   @override
   void initState() {
@@ -32,6 +34,17 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     setState(() => _loadingExpenses = true);
     try {
       await authProvider.ShowAllInfo();
+
+      if (authProvider.userData?['Savings'] != null) {
+        setState(() {
+          _accountOptions = ['Untracked']..addAll(
+            (authProvider.userData?['Savings'] as List)
+                .map((saving) => saving['Name'].toString())
+                .toList(),
+          );
+          _selectedAccount = null;
+        });
+      }
     } finally {
       setState(() => _loadingExpenses = false);
     }
@@ -66,16 +79,12 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
       _NameController.text = expense['Name'];
       _AmountController.text = expense['Amount'].toString();
       _CategoryController.text = expense['Category'];
-      if (expense['InitialTime'] != null) {
-        _InitialTimeController.text =
-            '${expense['InitialTime']['Month']}/${expense['InitialTime']['Day']}/${expense['InitialTime']['Year']}';
-      } else {
-        _InitialTimeController.clear();
-      }
-
+      _InitialTimeController.text =
+          '${expense['InitialTime']['Month']}/${expense['InitialTime']['Day']}/${expense['InitialTime']['Year']}';
       setState(() {
         _isRecurring = expense['IfRecurring'];
         _editingIndex = index;
+        _selectedAccount = expense['Account'] ?? 'Untracked';
       });
     }
   }
@@ -133,6 +142,26 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                           border: OutlineInputBorder(),
                           labelText: 'Amount',
                         ),
+                      ),
+                      SizedBox(height: 5),
+                      DropdownButtonFormField<String>(
+                        value: _selectedAccount,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Account',
+                        ),
+                        items:
+                            _accountOptions.map((String account) {
+                              return DropdownMenuItem<String>(
+                                value: account,
+                                child: Text(account),
+                              );
+                            }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _selectedAccount = newValue;
+                          });
+                        },
                       ),
                       SizedBox(height: 5),
                       TextField(
@@ -239,6 +268,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                         _NameController.text,
                                         int.parse(_AmountController.text),
                                         _CategoryController.text,
+                                        _selectedAccount ?? '',
                                         _isRecurring,
                                         InitialTime: {
                                           'Month': int.parse(dateParts[0]),

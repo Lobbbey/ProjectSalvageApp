@@ -178,6 +178,7 @@ class AuthProvider with ChangeNotifier {
   Future<void> AddIncome(
     String Name,
     int Amount,
+    String Account,
     bool IfRecurring, {
     required Map<String, int> InitialTime,
   }) async {
@@ -190,6 +191,7 @@ class AuthProvider with ChangeNotifier {
       final Map<String, dynamic> requestBody = {
         'Name': Name,
         'Amount': Amount,
+        'Account': Account,
         'IfRecurring': IfRecurring,
         'InitialTime': {
           'Month': InitialTime['Month'],
@@ -227,6 +229,7 @@ class AuthProvider with ChangeNotifier {
   Future<void> AddExpense(
     String Name,
     int Amount,
+    String Account,
     String Category,
     bool IfRecurring, {
     required Map<String, int> InitialTime,
@@ -247,6 +250,7 @@ class AuthProvider with ChangeNotifier {
           'Name': Name,
           'Amount': Amount,
           'Category': Category,
+          'Account': Account,
           'IfRecurring': IfRecurring,
           'InitialTime': {
             'Month': InitialTime['Month'],
@@ -379,11 +383,11 @@ class AuthProvider with ChangeNotifier {
         },
         encoding: Encoding.getByName("utf-8"),
         body: jsonEncode({
-          'Name': newName,
+          'NewName': newName,
           'index': index,
-          'Amount': newAmount,
-          'IfReccuring': newIfRecurring,
-          'InitialTime': {
+          'NewAmount': newAmount,
+          'NewIfRecurring': newIfRecurring,
+          'NewInitialTime': {
             'Month': InitialTime['Month'],
             'Day': InitialTime['Day'],
             'Year': InitialTime['Year'],
@@ -393,11 +397,14 @@ class AuthProvider with ChangeNotifier {
       final responseData = json.decode(response.body);
       if (response.statusCode == 200) {
         _errorMessage = "Success: ${responseData['Result']}";
+        notifyListeners();
       } else {
         _errorMessage = "⚠️ Error: ${responseData['Result']}";
+        notifyListeners();
       }
     } catch (e) {
       _errorMessage = "Failed to edit income";
+      notifyListeners();
     }
   }
 
@@ -423,12 +430,12 @@ class AuthProvider with ChangeNotifier {
         },
         encoding: Encoding.getByName("utf-8"),
         body: jsonEncode({
-          'Name': newName,
+          'NewName': newName,
           'index': index,
-          'Amount': newAmount,
-          'Category': newCategory,
-          'IfReccuring': newIfRecurring,
-          'InitialTime': {
+          'NewAmount': newAmount,
+          'NewCategory': newCategory,
+          'NewIfRecurring': newIfRecurring,
+          'NewInitialTime': {
             'Month': InitialTime['Month'],
             'Day': InitialTime['Day'],
             'Year': InitialTime['Year'],
@@ -467,11 +474,11 @@ class AuthProvider with ChangeNotifier {
         },
         encoding: Encoding.getByName("utf-8"),
         body: jsonEncode({
-          'Name': newName,
           'index': index,
-          'Amount': newAmount,
-          'APR': newAPR,
-          'InitialTime': {
+          'NewName': newName,
+          'NewAmount': newAmount,
+          'NewAPR': newAPR,
+          'NewInitialTime': {
             'Month': InitialTime['Month'],
             'Day': InitialTime['Day'],
             'Year': InitialTime['Year'],
@@ -511,13 +518,13 @@ class AuthProvider with ChangeNotifier {
         },
         encoding: Encoding.getByName("utf-8"),
         body: jsonEncode({
-          'Name': newName,
           'index': index,
-          'Amount': newAmount,
-          'APR': newAPR,
-          'Monthly': newMonthly,
-          'LoanLength': newLoadLength,
-          'InitialTime': {
+          'NewName': newName,
+          'NewAmount': newAmount,
+          'NewAPR': newAPR,
+          'NewMonthly': newMonthly,
+          'NewLoanLength': newLoadLength,
+          'NewInitialTime': {
             'Month': InitialTime['Month'],
             'Day': InitialTime['Day'],
             'Year': InitialTime['Year'],

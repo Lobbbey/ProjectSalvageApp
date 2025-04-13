@@ -55,7 +55,7 @@ class _DebtScreenState extends State<DebtScreen> {
 
   void _editDebt(int index) {
     final debts =
-        Provider.of<AuthProvider>(context, listen: false).userData?['Debt'] ??
+        Provider.of<AuthProvider>(context, listen: false).userData?['Debts'] ??
         [];
     if (index >= 0 && index < debts.length) {
       final debt = debts[index];
@@ -86,7 +86,7 @@ class _DebtScreenState extends State<DebtScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
-    final debts = authProvider.userData?['Debt'] ?? [];
+    final debts = authProvider.userData?['Debts'] ?? [];
 
     return Scaffold(
       appBar: AppBar(
@@ -129,7 +129,7 @@ class _DebtScreenState extends State<DebtScreen> {
                       SizedBox(height: 5),
                       TextField(
                         controller: _APRController,
-                        keyboardType: TextInputType.text,
+                        keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'APR',

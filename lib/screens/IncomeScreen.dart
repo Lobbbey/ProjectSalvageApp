@@ -19,6 +19,8 @@ class _IncomeScreenState extends State<IncomeScreen> {
   String _alertMessage = '';
   bool _loadingIncomes = false;
   int? _editingIndex;
+  String? _selectedAccount;
+  List<String> _accountOptions = ['Untracked'];
 
   @override
   void initState() {
@@ -31,6 +33,17 @@ class _IncomeScreenState extends State<IncomeScreen> {
     setState(() => _loadingIncomes = true);
     try {
       await authProvider.ShowAllInfo();
+      
+      if (authProvider.userData?['Savings'] != null) {
+        setState(() {
+          _accountOptions = ['Untracked']..addAll(
+            (authProvider.userData?['Savings'] as List)
+                .map((saving) => saving['Name'].toString())
+                .toList(),
+          );
+          _selectedAccount = null; 
+        });
+      }
     } finally {
       setState(() => _loadingIncomes = false);
     }
@@ -66,6 +79,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
       setState(() {
         _isRecurring = income['IfRecurring'];
         _editingIndex = index;
+         _selectedAccount = income['Account'] ?? 'Untracked';
       });
     }
   }
@@ -114,7 +128,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
                           labelText: 'Income Name',
                         ),
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: 5),
                       TextField(
                         controller: _AmountController,
                         keyboardType: TextInputType.number,
@@ -123,7 +137,27 @@ class _IncomeScreenState extends State<IncomeScreen> {
                           labelText: 'Amount',
                         ),
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: 5),
+                      DropdownButtonFormField<String>(
+                        value: _selectedAccount,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Account',
+                        ),
+                        items:
+                            _accountOptions.map((String account) {
+                              return DropdownMenuItem<String>(
+                                value: account,
+                                child: Text(account),
+                              );
+                            }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _selectedAccount = newValue;
+                          });
+                        },
+                      ),
+                      SizedBox(height: 5),
                       TextField(
                         controller: _InitialTimeController,
                         decoration: InputDecoration(
@@ -143,7 +177,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
                           }
                         },
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: 5),
                       Row(
                         children: [
                           Text('Recurring:'),
@@ -216,6 +250,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
                                       await authProvider.AddIncome(
                                         _NameController.text,
                                         int.parse(_AmountController.text),
+                                        _selectedAccount ?? '',
                                         _isRecurring,
                                         InitialTime: {
                                           'Month': int.parse(dateParts[0]),
@@ -276,14 +311,14 @@ class _IncomeScreenState extends State<IncomeScreen> {
                           itemBuilder: (context, index) {
                             final income = incomes[index];
                             final initialTime = income['InitialTime'];
-                            final dateString =
-                                (initialTime != null)
-                                    ? '${initialTime['Month']}/${initialTime['Day']}/${initialTime['Year']}'
-                                    : 'No date';
+                            //final dateString =
+                            //  (initialTime != null)
+                            //    ? '${initialTime['Month']}/${initialTime['Day']}/${initialTime['Year']}'
+                            //  : 'No date';
 
                             return ListTile(
                               title: Text(income['Name']),
-                              subtitle: Text('\$${income['Amount']} • $dateString'),
+                              subtitle: Text('\$${income['Amount']} '),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
