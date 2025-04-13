@@ -249,8 +249,8 @@ class AuthProvider with ChangeNotifier {
         body: jsonEncode({
           'Name': Name,
           'Amount': Amount,
-          'Category': Category,
           'Account': Account,
+          'Category': Category,
           'IfRecurring': IfRecurring,
           'InitialTime': {
             'Month': InitialTime['Month'],

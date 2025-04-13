@@ -144,6 +144,15 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                         ),
                       ),
                       SizedBox(height: 5),
+                      TextField(
+                        controller: _CategoryController,
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Category',
+                        ),
+                      ),
+                      SizedBox(height: 5),
                       DropdownButtonFormField<String>(
                         value: _selectedAccount,
                         decoration: InputDecoration(
@@ -162,15 +171,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                             _selectedAccount = newValue;
                           });
                         },
-                      ),
-                      SizedBox(height: 5),
-                      TextField(
-                        controller: _CategoryController,
-                        keyboardType: TextInputType.text,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Category',
-                        ),
                       ),
                       SizedBox(height: 5),
                       TextField(
@@ -267,8 +267,8 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                       await authProvider.AddExpense(
                                         _NameController.text,
                                         int.parse(_AmountController.text),
-                                        _CategoryController.text,
                                         _selectedAccount ?? '',
+                                        _CategoryController.text,
                                         _isRecurring,
                                         InitialTime: {
                                           'Month': int.parse(dateParts[0]),
