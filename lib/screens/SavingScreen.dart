@@ -111,8 +111,6 @@ class _SavingScreenState extends State<SavingScreen> {
                       TextField(
                         controller: _NameController,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
                           border: OutlineInputBorder(),
                           labelText: 'Saving Name',
                         ),
@@ -122,8 +120,6 @@ class _SavingScreenState extends State<SavingScreen> {
                         controller: _AmountController,
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
                           border: OutlineInputBorder(),
                           labelText: 'Amount',
                         ),
@@ -133,8 +129,6 @@ class _SavingScreenState extends State<SavingScreen> {
                         controller: _APRController,
                         keyboardType: TextInputType.text,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
                           border: OutlineInputBorder(),
                           labelText: 'APR',
                         ),
@@ -143,8 +137,6 @@ class _SavingScreenState extends State<SavingScreen> {
                       TextField(
                         controller: _InitialTimeController,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
                           border: OutlineInputBorder(),
                           labelText: 'Date (MM/DD/YYYY)',
                         ),
@@ -167,7 +159,6 @@ class _SavingScreenState extends State<SavingScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Text(
                             _alertMessage,
-                            style: TextStyle(color: Colors.white),
                           ),
                         ),
                       ElevatedButton(
@@ -262,7 +253,6 @@ class _SavingScreenState extends State<SavingScreen> {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20),
