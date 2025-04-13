@@ -145,9 +145,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
                       SizedBox(height: 10),
                       Row(
                         children: [
-                          Text(
-                            'Recurring:',
-                          ),
+                          Text('Recurring:'),
                           Radio(
                             value: true,
                             groupValue: _isRecurring,
@@ -155,7 +153,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
                                 (value) =>
                                     setState(() => _isRecurring = value!),
                           ),
-                          Text('Yes',),
+                          Text('Yes'),
                           Radio(
                             value: false,
                             groupValue: _isRecurring,
@@ -163,15 +161,13 @@ class _IncomeScreenState extends State<IncomeScreen> {
                                 (value) =>
                                     setState(() => _isRecurring = value!),
                           ),
-                          Text('No',),
+                          Text('No'),
                         ],
                       ),
                       if (_alertMessage.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text(
-                            _alertMessage,
-                          ),
+                          child: Text(_alertMessage),
                         ),
                       ElevatedButton(
                         onPressed:
@@ -278,10 +274,16 @@ class _IncomeScreenState extends State<IncomeScreen> {
                           itemCount: incomes.length,
                           itemBuilder: (context, index) {
                             final income = incomes[index];
+                            final initialTime = income['InitialTime'];
+                            final dateString =
+                                (initialTime != null)
+                                    ? '${initialTime['Month']}/${initialTime['Day']}/${initialTime['Year']}'
+                                    : 'No date';
+
                             return ListTile(
                               title: Text(income['Name']),
                               subtitle: Text(
-                                '\$${income['Amount']} • ${income['InitialTime']['Month']}/${income['InitialTime']['Day']}/${income['InitialTime']['Year']}',
+                                '${income['Category']} • \$${income['Amount']} • $dateString',
                               ),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,

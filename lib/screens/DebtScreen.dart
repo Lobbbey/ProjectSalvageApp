@@ -100,7 +100,6 @@ class _DebtScreenState extends State<DebtScreen> {
         ),
       ),
       drawer: CustomDrawer(),
-      backgroundColor: Colors.red,
       body: SafeArea(
         child: Column(
           children: [
@@ -114,8 +113,6 @@ class _DebtScreenState extends State<DebtScreen> {
                       TextField(
                         controller: _NameController,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
                           border: OutlineInputBorder(),
                           labelText: 'Debt Name',
                         ),
@@ -125,8 +122,6 @@ class _DebtScreenState extends State<DebtScreen> {
                         controller: _AmountController,
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
                           border: OutlineInputBorder(),
                           labelText: 'Amount',
                         ),
@@ -136,8 +131,6 @@ class _DebtScreenState extends State<DebtScreen> {
                         controller: _APRController,
                         keyboardType: TextInputType.text,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
                           border: OutlineInputBorder(),
                           labelText: 'APR',
                         ),
@@ -147,8 +140,6 @@ class _DebtScreenState extends State<DebtScreen> {
                         controller: _MonthlyController,
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
                           border: OutlineInputBorder(),
                           labelText: 'Monthly',
                         ),
@@ -158,8 +149,6 @@ class _DebtScreenState extends State<DebtScreen> {
                         controller: _LoanLengthController,
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
                           border: OutlineInputBorder(),
                           labelText: 'Loan Length',
                         ),
@@ -168,8 +157,6 @@ class _DebtScreenState extends State<DebtScreen> {
                       TextField(
                         controller: _InitialTimeController,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
                           border: OutlineInputBorder(),
                           labelText: 'Date (MM/DD/YYYY)',
                         ),
@@ -192,7 +179,6 @@ class _DebtScreenState extends State<DebtScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Text(
                             _alertMessage,
-                            style: TextStyle(color: Colors.white),
                           ),
                         ),
                       ElevatedButton(
@@ -293,7 +279,6 @@ class _DebtScreenState extends State<DebtScreen> {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(10),
                     topRight: Radius.circular(10),

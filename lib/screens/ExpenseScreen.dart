@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:flutter_application_1/AuthProvider.dart';
 
 class ExpenseScreen extends StatefulWidget {
+  const ExpenseScreen({super.key});
+
   @override
   _ExpenseScreenState createState() => _ExpenseScreenState();
 }
@@ -164,9 +166,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                       SizedBox(height: 5),
                       Row(
                         children: [
-                          Text(
-                            'Recurring:',
-                          ),
+                          Text('Recurring:'),
                           Radio(
                             value: true,
                             groupValue: _isRecurring,
@@ -174,7 +174,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                 (value) =>
                                     setState(() => _isRecurring = value!),
                           ),
-                          Text('Yes',),
+                          Text('Yes'),
                           Radio(
                             value: false,
                             groupValue: _isRecurring,
@@ -182,15 +182,13 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                 (value) =>
                                     setState(() => _isRecurring = value!),
                           ),
-                          Text('No',),
+                          Text('No'),
                         ],
                       ),
                       if (_alertMessage.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text(
-                            _alertMessage,
-                          ),
+                          child: Text(_alertMessage),
                         ),
                       ElevatedButton(
                         onPressed:
