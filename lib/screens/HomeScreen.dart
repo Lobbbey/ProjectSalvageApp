@@ -40,13 +40,6 @@ class CustomDrawer extends StatelessWidget {
             onChanged: (val) => themeProvider.toggleTheme(val),
             secondary: Icon(isDarkMode ? Icons.dark_mode : Icons.light_mode),
           ),
-          ListTile(
-            title: const Text('Home'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pushReplacementNamed(context, '/home');
-            },
-          ),
           if (!authProvider.isLoggedIn)
             ListTile(
               title: const Text('Login'),

@@ -13,12 +13,6 @@ class CustomDrawer extends StatelessWidget {
             decoration: BoxDecoration(color: Colors.blue),
             child: Text('Dashboard'),
           ),
-          ListTile(
-            title: const Text('Home'),
-            onTap: () {
-              Navigator.pushNamed(context, '/home');
-            },
-          ),
           if (!authProvider.isLoggedIn)
             ListTile(
               title: const Text('Login'),
@@ -35,20 +29,6 @@ class CustomDrawer extends StatelessWidget {
             ),
           if (authProvider.isLoggedIn)
             ListTile(
-              title: const Text('Income'),
-              onTap: () {
-                Navigator.pushNamed(context, '/income');
-              },
-            ),
-          if (authProvider.isLoggedIn)
-            ListTile(
-              title: const Text('Expenses'),
-              onTap: () {
-                Navigator.pushNamed(context, '/expense');
-              },
-            ),
-          if (authProvider.isLoggedIn)
-            ListTile(
               title: const Text('Savings'),
               onTap: () {
                 Navigator.pushNamed(context, '/saving');
@@ -60,14 +40,7 @@ class CustomDrawer extends StatelessWidget {
               onTap: () {
                 Navigator.pushNamed(context, '/debt');
               },
-            ),
-          if (authProvider.isLoggedIn)
-            ListTile(
-              title: const Text('Analytics'),
-              onTap: () {
-                Navigator.pushNamed(context, '/analytics');
-              },
-            ),
+            ),    
           if (authProvider.isLoggedIn)
             ListTile(
               title: const Text('Logout'),

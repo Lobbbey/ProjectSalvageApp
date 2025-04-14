@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/IncomeScreen.dart';
 import 'package:flutter_application_1/screens/AnalyticsScreen.dart';
-import 'package:flutter_application_1/screens/DebtScreen.dart';
 import 'package:flutter_application_1/screens/ExpenseScreen.dart';
 import 'package:flutter_application_1/screens/LoginScreen.dart';
 import 'package:flutter_application_1/screens/SignUpScreen.dart';
